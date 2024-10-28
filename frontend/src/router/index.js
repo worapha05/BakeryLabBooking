@@ -69,6 +69,11 @@ const router = createRouter({
       name: 'admin-use-room',
       component: AdminUseRoomView
     },
+    {
+      path: '/admin/use-room',
+      name: 'admin-use-room',
+      component: AdminUseRoomView
+    },
   ]
 })
 

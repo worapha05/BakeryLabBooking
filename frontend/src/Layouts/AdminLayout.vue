@@ -3,9 +3,6 @@ import { RouterLink } from 'vue-router'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NavbarLogin from '@/components/NavbarLogin.vue'
-import { useUserStore } from '@/stores/user'
-  
-const userStore = useUserStore()
 
 const route = useRoute()
 
