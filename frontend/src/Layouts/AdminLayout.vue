@@ -2,6 +2,10 @@
 import { RouterLink } from 'vue-router'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
+import NavbarLogin from '@/components/NavbarLogin.vue'
+import { useUserStore } from '@/stores/user'
+  
+const userStore = useUserStore()
 
 const route = useRoute()
 
@@ -33,6 +37,8 @@ currentPath.value = route.path
 </script>
 
 <template>
+    <NavbarLogin>
+    </NavbarLogin>
   <div class="drawer drawer-open">
     <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content">
