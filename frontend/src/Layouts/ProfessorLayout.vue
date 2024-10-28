@@ -8,24 +8,12 @@ const route = useRoute()
 
 const pageData = [
     {
-        name: 'การเข้าใช้ห้อง',
-        route: '/admin/use-room',
+      name: 'คำร้องขออนุมัติ',
+      route: '/professor/approval/request',
     },
     {
-        name: 'เครื่องมือและอุปกรณ์',
-        route: '/admin/eqiuipment/list',
-    },
-    {
-        name: 'เพิ่มบัญชี',
-        route: '/admin/users/create',
-    },
-    {
-        name: 'จัดการบัญชี',
-        route: '/admin/users/list',
-    },
-    {
-        name: 'My account',
-        route: '/admin/my-account',
+      name: 'My account',
+      route: '/professor/my-account',
     }
 ]
 
@@ -51,7 +39,7 @@ currentPath.value = route.path
                     <img src="@/assets/Piglet.webp" alt="">
                 </div>
             </div>
-            Admin
+            นวณวรรณ เรืองรุ่ง
         </div>
         </li>
         <li v-for="page in pageData">

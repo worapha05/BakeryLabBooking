@@ -7,13 +7,26 @@ import AdminUserListView from '@/views/admin/user/ListView.vue'
 import AdminUpdateUserView from '@/views/admin/user/UpdateView.vue'
 import AdminEquipmentListView from '@/views/admin/equipment/ListView.vue'
 import AdminUpdateEquipmentView from '@/views/admin/equipment/UpdateView.vue'
-import AdminMyAccountView from '@/views/admin/MyAccount.vue'
+import AdminMyAccountView from '@/views/admin/MyAccountView.vue'
 import AdminUseRoomView from '@/views/admin/user/UseRoomView.vue'
 import LoginView from '@/views/LoginView.vue'
 
+// student site
+
+import StudentBookingBakeryLabView from '@/views/student/BookingBakeryLabView.vue'
+import StudentMyAccountView from '@/views/student/MyAccountView.vue'
+import studentBookingResultView from '@/views/student/BookingResultView.vue'
+import StudentLabUsageHistoryView from '@/views/student/LabUsageHistoryView.vue'
+import StudentBookingScheduleView from '@/views/student/BookingScheduleView.vue'
+
+// Professor site
+
+import ProfessorMyAccountView from '@/views/professor/MyAccountView.vue'
+import ProfessorApprovalRequestView from '@/views/professor/ApprovalRequestView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+  routes: [ 
     {
       path: '/',
       name: 'home',
@@ -74,6 +87,41 @@ const router = createRouter({
       name: 'admin-use-room',
       component: AdminUseRoomView
     },
+    {
+      path: '/student/booking/bakery-lab',
+      name: 'student-booking-bakery-lab',
+      component: StudentBookingBakeryLabView
+    },
+    {
+      path: '/student/my-account',
+      name: 'student-my-account',
+      component: StudentMyAccountView
+    },
+    {
+      path: '/student/booking/result',
+      name: 'student-booking-result',
+      component: studentBookingResultView
+    },
+    {
+      path: '/student/usage/history',
+      name: 'student-usage-history',
+      component: StudentLabUsageHistoryView
+    },
+    {
+      path: '/student/booking/schedule',
+      name: 'student-booking-schedule',
+      component: StudentBookingScheduleView
+    },
+    {
+      path: '/professor/my-account',
+      name: 'professor-my-account',
+      component: ProfessorMyAccountView
+    },
+    {
+      path: '/professor/approval/request',
+      name: 'professor-approval-request',
+      component: ProfessorApprovalRequestView
+    }
   ]
 })
 

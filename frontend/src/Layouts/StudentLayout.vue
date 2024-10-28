@@ -8,24 +8,24 @@ const route = useRoute()
 
 const pageData = [
     {
-        name: 'การเข้าใช้ห้อง',
-        route: '/admin/use-room',
+        name: 'ตารางการจอง',
+        route: '/student/booking/schedule',
     },
     {
-        name: 'เครื่องมือและอุปกรณ์',
-        route: '/admin/eqiuipment/list',
+        name: 'จองห้องเบเกอรี่',
+        route: '/student/booking/bakery-lab',
     },
     {
-        name: 'เพิ่มบัญชี',
-        route: '/admin/users/create',
+        name: 'ผลการขอจอง',
+        route: '/student/booking/result',
     },
     {
-        name: 'จัดการบัญชี',
-        route: '/admin/users/list',
+        name: 'ประวัติการใช้ห้อง',
+        route: '/student/usage/history',
     },
     {
         name: 'My account',
-        route: '/admin/my-account',
+        route: '/student/my-account',
     }
 ]
 
@@ -51,7 +51,7 @@ currentPath.value = route.path
                     <img src="@/assets/Piglet.webp" alt="">
                 </div>
             </div>
-            Admin
+            ดารารัตน์ จิตไพศาล
         </div>
         </li>
         <li v-for="page in pageData">
