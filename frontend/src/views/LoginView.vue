@@ -24,10 +24,14 @@ import NavbarLogin from '@/components/NavbarLogin.vue'
             <input type="text" class="grow" placeholder="Password" />
           </label>
           <div class="login-button">
-            <a class="btn flex justify-center custom-login-btn mt-2">Login</a>
+            <RouterLink to="/login" class="btn flex justify-center custom-login-btn mt-2">
+                Login
+            </RouterLink>
           </div>
           <div class="create-account-button">
-            <a class="btn flex justify-center btn-ghost custom-create-account-btn">Create account</a>
+            <RouterLink to="/register" class="btn flex justify-center btn-ghost custom-create-account-btn">
+                Create account
+            </RouterLink>
           </div>
         </div>
       </div>

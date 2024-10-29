@@ -6,6 +6,7 @@ const equipments = ["เตาอบ", "เครื่องนวดแป้�
                     "แปรงทาเนย/ไข่", "เครื่องชั่ง", "ถาดอบ",
                     "ชามผสม"]
 </script>
+
 <template>
     <StudentLayout>
         <div class="m-3 border-2 rounded-xl p-4">
@@ -90,6 +91,18 @@ const equipments = ["เตาอบ", "เครื่องนวดแป้�
                     <li v-for="equipment in equipments"><input type="checkbox" class="my-3">{{ equipment }}</li>
                 </ul>
             </div>
+            <div class="create-account-btn my-10 flex justify-center">
+                <RouterLink to="/student/booking/result" class="btn custom-create-account-btn mt-2">
+                    ยืนยันการจอง
+                </RouterLink>
+            </div>
         </div>
     </StudentLayout>
 </template>
+
+<style scoped>
+.custom-create-account-btn {
+  background-color: #15570F;
+  color: #fff;
+}
+</style>

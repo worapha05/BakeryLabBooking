@@ -1,21 +1,26 @@
 <template>
     <div class="navbar bg-base-100 custom-navbar-shadow">
       <div class="flex-1">
-        <a class="btn btn-ghost text-xl">Kasetsart Bakery Lab Booking</a>
+        <RouterLink to="/" class="btn btn-ghost text-xl" @click.prevent="login">
+            Kasetsart Bakery Lab Booking
+        </RouterLink>
       </div>
       <!-- Navbar แสดงผลตามสถานะการล็อกอิน -->
       <div v-if="!userStore.isLoggedIn">
         <div class="navbar-home">
-          <a class="btn btn-ghost mx-1">Home</a>
-        </div>
-        <div class="navbar-booking">
-          <a class="btn btn-ghost mx-1">Booking</a>
+          <RouterLink to="/" class="btn btn-ghost mx-1">
+                Home
+            </RouterLink>
         </div>
         <div class="navbar-register">
-          <a class="btn btn-ghost mx-1">Register</a>
+            <RouterLink to="/register" class="btn btn-ghost mx-1">
+                Register
+            </RouterLink>
         </div>
         <div class="navbar-login">
-          <a class="btn custom-login-btn mx-1" @click="login">Login</a>
+          <RouterLink to="/login" class="btn custom-login-btn mx-1" @click.prevent="login">
+                Login
+            </RouterLink>
         </div>
       </div>
       <div v-else>
