@@ -1,22 +1,33 @@
-import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import axios from 'axios'
 
-export const useUserStore = defineStore('user', () => {
-  const isLoggedIn = ref(false)
-  const userName = ref('')
-  const userID = ref('')
+const BASE_URL = 'http://localhost:8000'
 
-  function login(id,name) {
-    isLoggedIn.value = true
-    userName.value = name
-    userID.value = id
+export const useUserStore = defineStore('user', {
+  state: () => ({
+    selectedUser: {},
+    isLogin: false
+  }),
+  actions: {
+    async login(email, password) {
+      try {
+        const userData = { KU_email: email, password: password }
+        const response = await axios.post(`${BASE_URL}/api/login`, userData)
+        const message = response.data.message
+
+        if (message === "Login successful") {
+          this.selectedUser = response.data.user
+          this.isLogin = true
+        } else {
+          throw new Error('Invalid email or password')
+        }
+      } catch (error) {
+        console.error('Login error:', error)
+        throw error
+      }
+    },
+    logout() {
+      this.isLogin = false
+    }
   }
-
-  function logout() {
-    isLoggedIn.value = true
-    userName.value = ''
-    userID.value = ''
-  }
-
-  return { isLoggedIn, userName, userID, login, logout }
 })

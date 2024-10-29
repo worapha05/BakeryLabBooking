@@ -60,6 +60,7 @@ const validateData = (personData) => {
 
     return errors
 }
+
 app.post('/api/register', async (req, res) => {
     try {
         let person = req.body
@@ -163,7 +164,38 @@ app.post("/api/login", async (req, res) => {
     } catch (error) {
         console.log('error', error)
     }
-    
+});
+
+app.post('/api/room-available', async (req, res) => {
+    const room = req.body;
+
+    // ตรวจสอบว่าข้อมูลมีค่าหรือไม่
+
+    const roomData = {
+        date: room.date,
+        time: room.time,
+        room_status: "available"
+    };
+
+    try {
+        const results = await conn.query("INSERT INTO room_availability SET ?", roomData);
+        res.send({ message: "add success"});
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+
+app.get('/api/room-available/:date', async (req, res) => {
+    const date = req.params.date;
+
+    try {
+        const results = await conn.query("SELECT * FROM room_availability WHERE date = ?", date);
+        res.send({ message: results[0]}); // ส่ง ID ของห้องที่ถูกจอง
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
 });
 
 app.listen(port, async (req, res) => {

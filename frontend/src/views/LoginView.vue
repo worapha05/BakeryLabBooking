@@ -1,6 +1,35 @@
 <script setup>
 import NavbarLogin from '@/components/NavbarLogin.vue'
+import { useUserStore } from '../stores/user'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const userStore = useUserStore()
+const router = useRouter()
+const email = ref('')
+const password = ref('')
+
+const login = async () => {
+  try {
+    await userStore.login(email.value, password.value)
+    if (userStore.isLogin) {
+      console.log(userStore.selectedUser)
+      if (userStore.selectedUser.role == "student") {
+        router.push('/student/my-account')
+      } else if (userStore.selectedUser.role == "professor") {
+        router.push('/professor/my-account')
+      } else {
+        router.push('/admin/my-account')
+      }
+    } else {
+      alert('Invalid email or password') // แสดงข้อความเตือน
+    }
+  } catch (error) {
+    alert('Login failed: ' + error.message)
+  }
+}
 </script>
+
 
 <template>
     <NavbarLogin class="absolute top-0 w-full" />
@@ -18,15 +47,15 @@ import NavbarLogin from '@/components/NavbarLogin.vue'
         <div class="card-body">
           <p class="text-center m-5">Please log-in before booking</p>
           <label class="input input-bordered flex items-center gap-2 mx-1 my-2">
-            <input type="text" class="grow" placeholder="Email address" />
+            <input type="text" class="grow" placeholder="Email address" v-model="email"/>
           </label>
           <label class="input input-bordered flex items-center gap-2 mx-1 my-2">
-            <input type="text" class="grow" placeholder="Password" />
+            <input type="password" class="grow" placeholder="Password" v-model="password"/>
           </label>
           <div class="login-button">
-            <RouterLink to="/login" class="btn flex justify-center custom-login-btn mt-2">
+            <button  @click="login()" class="btn w-full flex justify-center custom-login-btn mt-2">
                 Login
-            </RouterLink>
+            </button>
           </div>
           <div class="create-account-button">
             <RouterLink to="/register" class="btn flex justify-center btn-ghost custom-create-account-btn">
