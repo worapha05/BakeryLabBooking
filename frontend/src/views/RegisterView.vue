@@ -20,12 +20,12 @@ import NavbarLogin from '@/components/NavbarLogin.vue'
             <div>
                 <div class="uploade-button flex justify-center">
                     <label class="btn border-black m-5 cursor-pointer"> <!-- ใช้ label เพื่อให้คลิกได้ -->
-                        <img src="@/assets/upload-icon.png" alt="">
+                        <img src="@/assets/icon-upload.png" alt="">
                         Upload
                         <input type="file" class="hidden" /> <!-- ซ่อน input จริง -->
                     </label>
                     <button class="btn border-black m-5">
-                        <img src="@/assets/bin-icon.png" alt="">
+                        <img src="@/assets/icon-bin.png" alt="">
                         Delete
                     </button>
                 </div>
