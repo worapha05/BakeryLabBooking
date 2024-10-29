@@ -26,7 +26,8 @@ export const useUserStore = defineStore('user', {
         throw error
       }
     },
-    logout() {
+    async logout() {
+      this.selectedUser = {}
       this.isLogin = false
     }
   }

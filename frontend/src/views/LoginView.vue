@@ -13,7 +13,6 @@ const login = async () => {
   try {
     await userStore.login(email.value, password.value)
     if (userStore.isLogin) {
-      console.log(userStore.selectedUser)
       if (userStore.selectedUser.role == "student") {
         router.push('/student/my-account')
       } else if (userStore.selectedUser.role == "professor") {
@@ -21,8 +20,6 @@ const login = async () => {
       } else {
         router.push('/admin/my-account')
       }
-    } else {
-      alert('Invalid email or password') // แสดงข้อความเตือน
     }
   } catch (error) {
     alert('Login failed: ' + error.message)
