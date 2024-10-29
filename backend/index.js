@@ -13,6 +13,7 @@ let conn = null
 
 const initMySQL = async () => {
     conn = await mysql.createConnection({
+        port: 8889,
         host: 'localhost',
         user: 'root',
         password: 'root',
@@ -186,6 +187,8 @@ app.post('/api/room-available', async (req, res) => {
     }
 });
 
+
+
 app.get('/api/room-available/:date', async (req, res) => {
     const date = req.params.date;
 
@@ -197,6 +200,63 @@ app.get('/api/room-available/:date', async (req, res) => {
         res.status(500).send({ message: "Internal server error" });
     }
 });
+
+app.put('/api/profile-save-change/:KU_email', async (req, res) => {
+    try {
+        let email = req.params.KU_email
+
+        const passwordHash = await bcrypt.hash(person.password, 10)
+
+        personData = {
+            KU_email: person.KU_email,
+            first_name: person.first_name,
+            last_name: person.last_name,
+            password: passwordHash,
+            role: person.role,
+            status: "enabled",
+            profile_image: person.profile_image
+        }
+        let results = await conn.query('INSERT INTO person SET ?', personData)
+
+
+
+        if (person.role == 'student') {
+
+            student = {
+                student_id: person.student_id,
+                KU_email: person.KU_email,
+                department: person.department,
+                blacklist_status: "nonblacklisted",
+                phone_number: person.phone_number
+            }
+
+            results = await conn.query('INSERT INTO student SET ?', student)
+        } else if (person.role == 'professor'){
+            professor = {
+                KU_email: person.KU_email,
+                department: person.department,
+                position: person.position,
+                phone_number: person.phone_number
+            }
+
+            results = await conn.query('INSERT INTO professor SET ?', professor)
+            
+        }
+        res.json({
+            message: 'insert ok',
+            data: results[0]
+        })
+
+    } catch (error) {
+        const errorMessage = error.message || 'something wrong'
+        const errors = error.errors || []
+        console.error('error message', error.message)
+        res.status(500).json({
+            message: errorMessage,
+            errors: errors
+        })
+    }
+})
 
 app.listen(port, async (req, res) => {
     await initMySQL()
