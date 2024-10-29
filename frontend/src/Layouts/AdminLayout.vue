@@ -3,6 +3,9 @@ import { RouterLink } from 'vue-router'
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NavbarLogin from '@/components/NavbarLogin.vue'
+import { useUserStore } from '@/stores/user'
+  
+const userStore = useUserStore()
 
 const route = useRoute()
 
@@ -31,6 +34,10 @@ const pageData = [
 
 const currentPath = ref('')
 currentPath.value = route.path
+
+const logout = () => {
+  userStore.logout()
+}
 </script>
 
 <template>
@@ -60,7 +67,7 @@ currentPath.value = route.path
           </RouterLink>
         </li>
         <li>
-            <RouterLink to="/login">
+            <RouterLink to="/login" @click="logout()">
                 ออกจากระบบ
             </RouterLink>
         </li>
