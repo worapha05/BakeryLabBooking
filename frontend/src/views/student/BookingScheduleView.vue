@@ -1,32 +1,39 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 import StudentLayout from '@/Layouts/StudentLayout.vue'
-import { eventStore } from '@/stores/booking';
+import { useBookingByDateStore } from '@/stores/bookingByDate';
 
-const event = eventStore()
-
-event.createEvent("1", "2024-10-29", "08.00-09.00")
+const bookingByDateStore = useBookingByDateStore()
 
 // วันที่ที่ผู้ใช้เลือก
 const selectedDate = ref(''); 
 
 // ข้อมูลช่วงเวลา (time slots)
 const timeSlots = [
-    { time: '08.00-09.00' },
-    { time: '09.00-10.00' },
-    { time: '10.00-11.00' },
-    { time: '11.00-12.00' },
-    { time: '12.00-13.00' },
-    { time: '13.00-14.00' },
-    { time: '14.00-15.00' },
-    { time: '15.00-16.00' },
-    { time: '16.00-17.00' },
+    { time: '08:00:00' },
+    { time: '09:00:00' },
+    { time: '10:00:00' },
+    { time: '11:00:00' },
+    { time: '12:00:00' },
+    { time: '13:00:00' },
+    { time: '14:00:00' },
+    { time: '15:00:00' },
+    { time: '16:00:00' },
 ];
 
-function isUnavailable(slotTime) {
-    return selectedDate.value === event.eventDate && slotTime === event.eventTime;
-}
+const isUnavailable = computed(() => {
+    return (slotTime) => {
+        return bookingByDateStore.list.some(item => item.time === slotTime);
+    };
+});
+
+// Load bookings when the selected date changes
+watch(selectedDate, async (newDate) => {
+    if (newDate) {
+        await bookingByDateStore.loadBookingByDate(newDate);
+    }
+});
 
 </script>
 
