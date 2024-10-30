@@ -39,19 +39,17 @@
   const userDetail = ref('')
 
   watch(
-  () => [userStore.selectedUser],
-   () => {
-      if (userStore.selectedUser.role === "student") { 
-        userDetail.value = `${userStore.selectedUser.student_id} ${userStore.selectedUser.first_name}`
-
-      } else if (userStore.selectedUser.role === "professor") {
-        userDetail.value = `${userStore.selectedUser.first_name} ${userStore.selectedUser.last_name}`
-
-      } else {
-        userDetail.value = 'Admin';
-      }
+  () => userStore.selectedUser,
+  (newUser) => {
+    if (newUser.role === "student") { 
+      userDetail.value = `${newUser.student_id} ${newUser.first_name}`;
+    } else if (newUser.role === "professor") {
+      userDetail.value = `${newUser.first_name} ${newUser.last_name}`;
+    } else {
+      userDetail.value = 'Admin';
+    }
   },
-  { immediate: true } // ให้รันครั้งแรกทันทีที่สร้าง
+  { deep: true, immediate: true }
 );
   // ฟังก์ชันล็อกอิน
   // function login() {

@@ -11,18 +11,24 @@ const password = ref('')
 
 const login = async () => {
   try {
-    await userStore.login(email.value, password.value)
+    await userStore.login(email.value, password.value);
+    
     if (userStore.isLogin) {
-      if (userStore.selectedUser.role == "student") {
-        router.push('/student/my-account')
-      } else if (userStore.selectedUser.role == "professor") {
-        router.push('/professor/my-account')
+      // Successful login; redirect based on user role
+      console.log('Login successful! Redirecting...'); // Use console log instead of alert
+      
+      if (userStore.selectedUser.role === "student") {
+        router.push('/student/my-account');
+      } else if (userStore.selectedUser.role === "professor") {
+        router.push('/professor/my-account');
       } else {
-        router.push('/admin/my-account')
+        router.push('/admin/my-account');
       }
     }
   } catch (error) {
-    alert('Login failed: ' + error.message)
+      console.error("error", error)
+      
+    // Optionally, you can update the UI to show an error message to the user
   }
 }
 </script>
@@ -50,7 +56,7 @@ const login = async () => {
             <input type="password" class="grow" placeholder="Password" v-model="password"/>
           </label>
           <div class="login-button">
-            <button  @click="login()" class="btn w-full flex justify-center custom-login-btn mt-2">
+            <button  @click="login" class="btn w-full flex justify-center custom-login-btn mt-2">
                 Login
             </button>
           </div>

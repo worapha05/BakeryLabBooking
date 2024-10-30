@@ -133,13 +133,23 @@ app.post('/api/register', async (req, res) => {
 app.post("/api/login", async (req, res) => {
     try {
         const { KU_email, password } = req.body;
-  
-        let [result] = await conn.query("SELECT * from person WHERE KU_email = ?", KU_email);
+
+        let [result] = await conn.query("SELECT * from person WHERE KU_email = ?", [KU_email]);
         const user = result[0];
+
+        if (!user) {
+            return res.status(404).send({ message: "ไม่พบผู้ใช้" });
+        }
+
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-        return res.status(400).send({ message: "Invalid email or password" });
+            return res.status(400).send({ message: "อีเมล์และรหัสผ่านไม่ถูกต้อง" });
         }
+
+        if (user.status === "disabled") {
+            return res.status(401).send({ message: "ไม่สามารถ Login" });
+        }
+
         let userData = {
             KU_email: user.KU_email,
             first_name: user.first_name,
@@ -147,62 +157,30 @@ app.post("/api/login", async (req, res) => {
             profile_image: user.profile_image,
             status: user.status,
             role: user.role
+        };
+
+        if (user.role === "student") {
+            [result] = await conn.query("SELECT * from student WHERE KU_email = ?", [KU_email]);
+            if (result[0]) {
+                userData.student_id = result[0].student_id;
+                userData.department = result[0].department;
+                userData.blacklist_status = result[0].blacklist_status;
+                userData.phone_number = result[0].phone_number;
+            }
+        } else if (user.role === "professor") {
+            [result] = await conn.query("SELECT * from professor WHERE KU_email = ?", [KU_email]);
+            if (result[0]) {
+                userData.professor_id = result[0].professor_id;
+                userData.department = result[0].department;
+                userData.position = result[0].position;
+                userData.phone_number = result[0].phone_number;
+            }
         }
 
-        if (user.role == "student") {
-            [result] = await conn.query("SELECT * from student WHERE KU_email = ?", KU_email)
-            userData.student_id = result[0].student_id
-            userData.department = result[0].department
-            userData.blacklist_status = result[0].blacklist_status
-            userData.phone_number = result[0].phone_number
-        } else if (user.role == "professor") {
-            [result] = await conn.query("SELECT * from professor WHERE KU_email = ?", KU_email)
-            userData.professor_id = result[0].professor_id
-            userData.department = result[0].department
-            userData.position = result[0].position
-            userData.phone_number = result[0].phone_number
-        }
-        res.send({ message: "Login successful",
-            user: userData
-        })
+        res.send({ message: "Login successful", user: userData });
     } catch (error) {
-        console.log('error', error)
-    }
-});
-
-// api เพิ่ม booking
-
-app.post('/api/room-available', async (req, res) => {
-    const room = req.body;
-
-    // ตรวจสอบว่าข้อมูลมีค่าหรือไม่
-
-    const roomData = {
-        date: room.date,
-        time: room.time,
-        room_status: "available"
-    };
-
-    try {
-        const results = await conn.query("INSERT INTO room_availability SET ?", roomData);
-        res.send({ message: "add success"});
-    } catch (error) {
-        console.error('Error inserting room availability:', error);
-        res.status(500).send({ message: "Internal server error" });
-    }
-});
-
-// api เช็ก booking ในแต่ละวัน
-
-app.get('/api/room-available/:date', async (req, res) => {
-    const date = req.params.date;
-
-    try {
-        const results = await conn.query("SELECT * FROM room_availability WHERE date = ?", date);
-        res.send({ message: results[0]}); // ส่ง ID ของห้องที่ถูกจอง
-    } catch (error) {
-        console.error('Error inserting room availability:', error);
-        res.status(500).send({ message: "Internal server error" });
+        console.error('Error during login:', error);
+        res.status(500).send({ message: "เกิดข้อผิดพลาดในการเข้าสู่ระบบ" });
     }
 });
 
@@ -216,21 +194,28 @@ app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
 
         // ตรวจสอบว่าผู้ใช้มีอยู่จริง
         if (results.length === 0) {
-            return res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "ไม่พบผู้ใช้" });
         }
 
-        if (person.password) {
+        // Handle password update if old password is provided
+        if (person.old_password !== person.new_password) {
             const currentPassword = results[0].password; // รหัสผ่านเดิมจากฐานข้อมูล
-            
+
             // ตรวจสอบว่ารหัสผ่านเดิมมีอยู่จริง
             if (currentPassword) {
-                const match = await bcrypt.compare(person.password, currentPassword);
+                const match = await bcrypt.compare(person.old_password, currentPassword);
 
-                // ถ้ารหัสผ่านไม่ตรงกัน ให้แฮชรหัสผ่านใหม่
-                if (!match) {
-                    const passwordHash = await bcrypt.hash(person.password, 10);
+                // ถ้ารหัสผ่านตรงกัน ให้แฮชรหัสผ่านใหม่
+                if (match && person.new_password) {
+                    const passwordHash = await bcrypt.hash(person.new_password, 10);
                     personData.password = passwordHash; // เพิ่มรหัสผ่านใหม่ที่แฮชเข้าไป
+                } else if (!match) {
+                    return res.status(401).json({ message: "รหัสผ่านเก่ไม่ถูกต้อง" });
                 }
+            }
+        } else {
+            if (person.new_password !== '' && person.new_password !== '') {
+                return res.status(401).json({ message: "รหัสผ่านเก่ากับรหัสผ่านใหม่ซ้ำกัน" });
             }
         }
 
@@ -241,11 +226,6 @@ app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
             status: person.status,
             profile_image: person.profile_image
         };
-
-        if (!match) {
-            const passwordHash = await bcrypt.hash(person.password, 10);
-            personData.password = passwordHash;
-        }
 
         await conn.query('UPDATE person SET ? WHERE KU_email = ?', [personData, KU_email]);
 
@@ -270,8 +250,44 @@ app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
     } catch (error) {
         console.error('Error:', error.message);
         res.status(500).json({
-            message: error.message || 'Something went wrong',
+            message: "มีบางอย่างผิดพลาด",
         });
+    }
+});
+
+
+// api เพิ่ม booking
+
+app.post('/api/room-available', async (req, res) => {
+    const room = req.body;
+
+    // ตรวจสอบว่าข้อมูลมีค่าหรือไม่
+
+    const roomData = {
+        date: room.date,
+        time: room.time
+    };
+
+    try {
+        const results = await conn.query("INSERT INTO room_availability SET ?", roomData);
+        res.send({ message: "add success"});
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+
+// api เช็ก booking ในแต่ละวัน
+
+app.get('/api/room-available/:date', async (req, res) => {
+    const date = req.params.date;
+
+    try {
+        const results = await conn.query("SELECT * FROM room_availability WHERE date = ?", date);
+        res.send({ room: results[0]}); // ส่ง ID ของห้องที่ถูกจอง
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
     }
 });
 

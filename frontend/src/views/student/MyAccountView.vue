@@ -27,13 +27,18 @@ const first_name = ref(userStore.selectedUser.first_name)
 const last_name = ref(userStore.selectedUser.last_name)
 const phone_number = ref(userStore.selectedUser.phone_number)
 const profile_image = ref(userStore.selectedUser.profile_image)
+const new_password = ref('')
+const old_password = ref('')
+
 
 const editData = async () => {
     const userData = {
     first_name: first_name,
     last_name: last_name,
     phone_number: phone_number,
-    profile_image: profile_image
+    profile_image: profile_image,
+    new_password: new_password,
+    old_password: old_password
     }
     try {
         await userStore.editUser(userData);
@@ -241,7 +246,7 @@ const editData = async () => {
                         <input type="text" class="input input-bordered w-96 mt-5"/>
                     </div>
                     <div class="flex justify-center">
-                        <button class="btn custom-change-btn w-36 mt-11 mb-14">
+                        <button class="btn custom-change-btn w-36 mt-11 mb-14" @click="editData">
                             ยืนยัน
                         </button>
                     </div>
