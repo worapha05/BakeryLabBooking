@@ -9,13 +9,20 @@ const statuses = ['Profile', 'Competition', 'Chang password']
 const userStore = useUserStore()
 
 const selectedStatus = ref("Profile")
-const filterBooingList = computed(() => {
-    return bookingDetail.filter(booking => booking.status === selectedStatus.value)
-})
+const isAddingCompetition = ref(false); // ตัวแปรที่ใช้ตรวจสอบสถานะ
+
+const startAddingCompetition = () => {
+    isAddingCompetition.value = true; // เปลี่ยนสถานะเมื่อกดปุ่ม
+};
+
+const backToCompetition = () => {
+    isAddingCompetition.value = false; // เปลี่ยนสถานะเมื่อกดปุ่ม
+};
 
 const changeSelectedStatus = ((newStatus) => {
     selectedStatus.value = newStatus
 })
+
 
 const editedFirstName = ref(userStore.selectedUser.first_name) 
 
@@ -131,20 +138,95 @@ const editedFirstName = ref(userStore.selectedUser.first_name)
 
         <!-- Competition -->
         <div v-if="selectedStatus == 'Competition'">
-            <div class="text-3xl mx-12">
+            <div class="flex justify-center">
                 <div class="main-container w-[1000px] bg-white shadow-lg mx-10 relative my-0 p-4 rounded-lg border-2 border-gray-300">
-                    <div class="flex">
-                        <div class="font-bold text-base ml-10 mt-5">
-                            Personal Information
-                            <div class="h-[0.5px] w-80 rounded-lg border-2 bg-gray-300 my-3"></div>
+                    <div v-if="!isAddingCompetition">
+                        <div class="flex">
+                            <div class="font-bold text-base ml-10 mt-5">
+                                ประวัติการแข่งขัน
+                                <div class="h-[0.5px] w-80 rounded-lg border-2 bg-gray-300 my-3"></div>
+                            </div>
+                            <button class="btn custom-add-comp-button absolute right-0 mt-2 mr-10" @click="startAddingCompetition">
+                                <img src="@/assets/icon-add-blue.png" alt="">
+                                เพิ่มการแข่งขัน
+                            </button>
                         </div>
-                        <button class="btn absolute right-0 mt-2 mr-52">
-                            <img src="@/assets/icon-add-blue.png" alt="">
-                            แก้ไข
+                    </div>
+                    <div v-else>
+                        <div class="flex">
+                            <div class="font-bold text-base ml-10 mt-5">
+                                ประวัติการแข่งขัน
+                                <div class="h-[0.5px] w-80 rounded-lg border-2 bg-gray-300 my-3"></div>
+                            </div>
+                            <button class="btn absolute right-0 border-2 border-gray-300 mt-2 mr-10" @click="backToCompetition">
+                                <img src="@/assets/icon-back.png" alt="">
+                                ย้อนกลับ
+                            </button>
+                        </div>
+                        <div class="ml-12 my-5">
+                            ใส่ชื่อการแข่งขันและรางวัลที่ได้
+                        </div>
+                        <input type="text" placeholder="" class="input input-bordered w-96 ml-12"/>
+                        <div class="ml-12 my-5 mt-10">
+                            เกียรติบัตรเพื่อเป็นหลักฐาน
+                        </div>
+                        <div>
+                            <label class="btn bg-white border-gray-300 ml-12 cursor-pointer"> <!-- ใช้ label เพื่อให้คลิกได้ -->
+                                <img src="@/assets/icon-add-black.png" alt="">
+                                Upload
+                                <input type="file" class="hidden" /> <!-- ซ่อน input จริง -->
+                            </label>
+                        </div>
+                        <button class="btn custom-change-btn w-36 ml-12 mt-12 mb-48">
+                            บันทึก
                         </button>
-                        <button class="btn custom-add-comp-button absolute right-0 mt-2 mr-10">
-                            <img src="@/assets/icon-add-blue.png" alt="">
-                            เพิ่มการแข่งขัน
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chang password -->
+        <div v-if="selectedStatus == 'Chang password'">
+            <div class="flex justify-center">
+                <div class="main-container w-[1000px] bg-white shadow-lg mx-10 relative my-0 p-4 rounded-lg border-2 border-gray-300">
+                    <div class="font-bold text-base ml-10 mt-5">
+                        เปลี่ยนรหัสผ่าน
+                        <div class="h-[0.5px] w-[880px] rounded-lg border-2 bg-gray-300 my-3"></div>
+                    </div>
+                    <div class="flex justify-center custom-blue-f text-xl mt-14">
+                        ตั้งค่ารหัสผ่านใหม่
+                    </div>
+                    <div class="flex justify-center text-gray-500 mt-5">
+                        กรุณาระบุรหัสผ่านใหม่ที่ต้องการ
+                    </div>
+                    <div class="flex mt-14">
+                        <div class="custom-blue-s ml-72">
+                            รหัสผ่านเก่า
+                        </div>
+                        <div class="custom-red ml-2">
+                            *
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <input type="text" class="input input-bordered w-96 mt-5"/>
+                    </div>
+                    <div class="flex justify-center text-gray-500 mt-5">
+                        รหัสผ่านของคุณต้องมีความยาวอย่างน้อย 8 ตัวอักษร
+                    </div>
+                    <div class="flex mt-10">
+                        <div class="custom-blue-s ml-72">
+                            รหัสผ่านใหม่
+                        </div>
+                        <div class="custom-red ml-2">
+                            *
+                        </div>
+                    </div>
+                    <div class="flex justify-center">
+                        <input type="text" class="input input-bordered w-96 mt-5"/>
+                    </div>
+                    <div class="flex justify-center">
+                        <button class="btn custom-change-btn w-36 mt-11 mb-14">
+                            ยืนยัน
                         </button>
                     </div>
                 </div>
@@ -157,6 +239,18 @@ const editedFirstName = ref(userStore.selectedUser.first_name)
 .custom-button {
     background-color: #2784E1;
     color: white;
+}
+
+.custom-blue-f {
+    color: #167FE9;
+}
+
+.custom-blue-s {
+    color: #2784E0;
+}
+
+.custom-red {
+    color: #CC1417;
 }
 
 .custom-select {
