@@ -66,7 +66,7 @@ const backToEquip = () => {
                         <input v-model="searchEquipment" type="text" placeholder="Search by EquipmentID" class="input input-bordered w-80 ml-5" />
                         <button class="btn custom-add-equip-button absolute right-0 mr-10" @click="startAddingEquipment">
                             <img src="@/assets/icon-add-blue.png" alt="">
-                            เพิ่มการแข่งขัน
+                            เพิ่มอุปกรณ์
                         </button>
                     </div>
                     <div class="ml-5">
@@ -110,19 +110,6 @@ const backToEquip = () => {
                             <img src="@/assets/icon-back.png" alt="">
                             ย้อนกลับ
                         </button>
-                    </div>
-                    <div class="flex">
-                        <div>
-                            <div class="ml-12 my-5">
-                                ID equipment*
-                            </div>
-                            <input type="text" placeholder="" class="input input-bordered w-96 ml-12"/>
-                        </div>
-                        <div class="mt-14">
-                            <button class="btn custom-operational-button w-20 ml-5 mt-2">
-                                Generate
-                            </button>
-                        </div>
                     </div>
                     <div class="ml-12 my-5">
                         ชื่ออุปกรณ์
