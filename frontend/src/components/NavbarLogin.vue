@@ -39,11 +39,8 @@
   const userDetail = ref('')
 
   watch(
-  () => [userStore.isLogin, userStore.selectedUser],
-  async () => {
-
-    if (userStore.isLogin) {
-      
+  () => [userStore.selectedUser],
+   () => {
       if (userStore.selectedUser.role === "student") { 
         userDetail.value = `${userStore.selectedUser.student_id} ${userStore.selectedUser.first_name}`
 
@@ -53,13 +50,6 @@
       } else {
         userDetail.value = 'Admin';
       }
-      
-      
-      
-    } else {
-      
-      userDetail.value = '';
-    }
   },
   { immediate: true } // ให้รันครั้งแรกทันทีที่สร้าง
 );

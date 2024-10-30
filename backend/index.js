@@ -13,7 +13,7 @@ let conn = null
 
 const initMySQL = async () => {
     conn = await mysql.createConnection({
-        port: 8889,
+        // port: 8889,
         host: 'localhost',
         user: 'root',
         password: 'root',
@@ -62,6 +62,7 @@ const validateData = (personData) => {
     return errors
 }
 
+// post api register
 app.post('/api/register', async (req, res) => {
     try {
         let person = req.body
@@ -127,6 +128,8 @@ app.post('/api/register', async (req, res) => {
     }
 })
 
+// api login
+
 app.post("/api/login", async (req, res) => {
     try {
         const { KU_email, password } = req.body;
@@ -167,6 +170,8 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
+// api เพิ่ม booking
+
 app.post('/api/room-available', async (req, res) => {
     const room = req.body;
 
@@ -187,7 +192,7 @@ app.post('/api/room-available', async (req, res) => {
     }
 });
 
-
+// api เช็ก booking ในแต่ละวัน
 
 app.get('/api/room-available/:date', async (req, res) => {
     const date = req.params.date;
@@ -201,62 +206,74 @@ app.get('/api/room-available/:date', async (req, res) => {
     }
 });
 
-app.put('/api/profile-save-change/:KU_email', async (req, res) => {
+app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
     try {
-        let email = req.params.KU_email
+        const KU_email = req.params.KU_email;
+        const person = req.body;
 
-        const passwordHash = await bcrypt.hash(person.password, 10)
+        // ตรวจสอบผู้ใช้ที่มี email นี้
+        let [results] = await conn.query("SELECT * from person WHERE KU_email = ?", [KU_email]);
 
-        personData = {
-            KU_email: person.KU_email,
+        // ตรวจสอบว่าผู้ใช้มีอยู่จริง
+        if (results.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (person.password) {
+            const currentPassword = results[0].password; // รหัสผ่านเดิมจากฐานข้อมูล
+            
+            // ตรวจสอบว่ารหัสผ่านเดิมมีอยู่จริง
+            if (currentPassword) {
+                const match = await bcrypt.compare(person.password, currentPassword);
+
+                // ถ้ารหัสผ่านไม่ตรงกัน ให้แฮชรหัสผ่านใหม่
+                if (!match) {
+                    const passwordHash = await bcrypt.hash(person.password, 10);
+                    personData.password = passwordHash; // เพิ่มรหัสผ่านใหม่ที่แฮชเข้าไป
+                }
+            }
+        }
+
+        // อัปเดตข้อมูลพื้นฐาน
+        const personData = {
             first_name: person.first_name,
             last_name: person.last_name,
-            password: passwordHash,
-            role: person.role,
-            status: "enabled",
+            status: person.status,
             profile_image: person.profile_image
+        };
+
+        if (!match) {
+            const passwordHash = await bcrypt.hash(person.password, 10);
+            personData.password = passwordHash;
         }
-        let results = await conn.query('INSERT INTO person SET ?', personData)
 
+        await conn.query('UPDATE person SET ? WHERE KU_email = ?', [personData, KU_email]);
 
-
-        if (person.role == 'student') {
-
-            student = {
-                student_id: person.student_id,
-                KU_email: person.KU_email,
-                department: person.department,
-                blacklist_status: "nonblacklisted",
+        if (person.role === 'student') {
+            const studentData = {
+                blacklist_status: person.blacklist_status,
                 phone_number: person.phone_number
-            }
-
-            results = await conn.query('INSERT INTO student SET ?', student)
-        } else if (person.role == 'professor'){
-            professor = {
-                KU_email: person.KU_email,
-                department: person.department,
-                position: person.position,
+            };
+            await conn.query('UPDATE student SET ? WHERE KU_email = ?', [studentData, KU_email]);
+        } else if (person.role === 'professor') {
+            const professorData = {
                 phone_number: person.phone_number
-            }
-
-            results = await conn.query('INSERT INTO professor SET ?', professor)
-            
+            };
+            await conn.query('UPDATE professor SET ? WHERE KU_email = ?', [professorData, KU_email]);
         }
+
         res.json({
-            message: 'insert ok',
-            data: results[0]
-        })
+            message: 'Update successful',
+            data: personData
+        });
 
     } catch (error) {
-        const errorMessage = error.message || 'something wrong'
-        const errors = error.errors || []
-        console.error('error message', error.message)
+        console.error('Error:', error.message);
         res.status(500).json({
-            message: errorMessage,
-            errors: errors
-        })
+            message: error.message || 'Something went wrong',
+        });
     }
-})
+});
 
 app.listen(port, async (req, res) => {
     await initMySQL()

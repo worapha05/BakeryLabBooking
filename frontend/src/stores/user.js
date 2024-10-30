@@ -29,6 +29,14 @@ export const useUserStore = defineStore('user', {
     async logout() {
       this.selectedUser = {}
       this.isLogin = false
+    },
+    async editUser(userData) {
+      try {
+        const response = await axios.patch(`${BASE_URL}/api/profile-save-change/${this.selectedUser.KU_email}`, userData)
+      } catch (error) {
+        console.error('Login error:', error)
+        throw error
+      }
     }
   }
 })
