@@ -1,5 +1,24 @@
 <script setup>
 import NavbarLogin from '@/components/NavbarLogin.vue'
+import { ref } from 'vue';
+
+const imageUrl = ref('');
+
+const onFileChange = (event) => {
+  const file = event.target.files[0]; // รับไฟล์ที่อัปโหลด
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imageUrl.value = e.target.result; // ตั้งค่า URL ของภาพเป็นผลลัพธ์ของ FileReader
+    };
+    reader.readAsDataURL(file); // อ่านไฟล์เป็น Data URL
+  }
+};
+
+const removeImage = () => {
+  imageUrl.value = ''; // ล้าง URL ของภาพเพื่อยกเลิกการแสดงพรีวิว
+};
+
 </script>
 
 <template>
@@ -14,7 +33,8 @@ import NavbarLogin from '@/components/NavbarLogin.vue'
             </div>
             <div class="avatar flex justify-center">
                 <div class="w-36 rounded-full border">
-                    <img src="@/assets/Piglet.webp" alt="">
+                    <img v-if="imageUrl" :src="imageUrl" alt="Image Preview" class="rounded-full" />
+                    <img v-else src="@/assets/default-avatar.png" alt="Default Avatar" class="rounded-full" />
                 </div>
             </div>
             <div>
@@ -22,9 +42,9 @@ import NavbarLogin from '@/components/NavbarLogin.vue'
                     <label class="btn border-black m-5 cursor-pointer"> <!-- ใช้ label เพื่อให้คลิกได้ -->
                         <img src="@/assets/icon-upload.png" alt="">
                         Upload
-                        <input type="file" class="hidden" /> <!-- ซ่อน input จริง -->
+                        <input type="file" class="hidden" @change="onFileChange"/> <!-- ซ่อน input จริง -->
                     </label>
-                    <button class="btn border-black m-5">
+                    <button class="btn border-black m-5" @click="removeImage">
                         <img src="@/assets/icon-bin.png" alt="">
                         Delete
                     </button>

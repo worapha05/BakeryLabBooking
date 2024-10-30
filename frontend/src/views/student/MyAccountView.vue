@@ -17,7 +17,24 @@ const changeSelectedStatus = ((newStatus) => {
     selectedStatus.value = newStatus
 })
 
-const editedFirstName = ref(userStore.selectedUser.first_name) 
+const first_name = ref(userStore.selectedUser.first_name)
+const last_name = ref(userStore.selectedUser.last_name)
+const phone_number = ref(userStore.selectedUser.phone_number)
+const profile_image = ref(userStore.selectedUser.profile_image)
+
+const editData = async () => {
+    const userData = {
+    first_name: first_name,
+    last_name: last_name,
+    phone_number: phone_number,
+    profile_image: profile_image
+    }
+    try {
+        await userStore.editUser(userData);
+    } catch (error) {
+        console.log('error', error);
+    }
+};
 
 </script>
 
@@ -66,13 +83,13 @@ const editedFirstName = ref(userStore.selectedUser.first_name)
                             <div class="my-5">
                                 ชื่อจริง
                             </div>
-                            <input type="text" class="input input-bordered w-80" v-model="editedFirstName"/>
+                            <input type="text" class="input input-bordered w-80" v-model="first_name"/>
                         </div>
                         <div class="mx-9">
                             <div class="my-5">
                                 นามสกุล
                             </div>
-                            <input type="text" class="input input-bordered w-80" v-model="userStore.selectedUser.last_name"/>
+                            <input type="text" class="input input-bordered w-80" v-model="last_name"/>
                         </div>
                     </div>
                     <div class="flex justify-center">
@@ -110,7 +127,7 @@ const editedFirstName = ref(userStore.selectedUser.first_name)
                             <div class="my-5">
                                 Phone
                             </div>
-                            <input type="text" placeholder="Phone" class="input input-bordered w-80" v-model="userStore.selectedUser.phone_number"/>
+                            <input type="text" placeholder="Phone" class="input input-bordered w-80" v-model="phone_number"/>
                         </div>
                     </div>
                     <div class="font-bold ml-10 mt-14">
@@ -123,7 +140,7 @@ const editedFirstName = ref(userStore.selectedUser.first_name)
                 </div>
             </div>
             <div class="flex justify-center">
-                <button class="btn custom-change-btn w-36 mt-9 mb-14">
+                <button class="btn custom-change-btn w-36 mt-9 mb-14" @click="editData">
                     save change
                 </button>
             </div>
