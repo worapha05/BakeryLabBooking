@@ -4,6 +4,21 @@ const mysql = require('mysql2/promise')
 const cors = require('cors')
 const app = express()
 const bcrypt = require('bcrypt')
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, '../frontend/src/assets')
+    },
+    filename: function (req, file, cb) {
+        const fileName = `${Date.now()}-${file.originalname}`
+        cb(null, fileName)
+    }
+    })
+  
+    const upload = multer({
+    storage: storage
+    })
 
 app.use(bodyParser.json())
 app.use(cors())
@@ -13,13 +28,26 @@ let conn = null
 
 const initMySQL = async () => {
     conn = await mysql.createConnection({
-        port: 8889,
+        // port: 8889,
         host: 'localhost',
         user: 'root',
         password: 'root',
         database: 'bakerylabbooking'
     })
 }
+
+// upload file
+
+app.post('/api/upload', upload.single('KU'), (req, res) => {
+    try {
+        console.log(req.file.filename); // ตรวจสอบว่า req.file มีข้อมูลไหม
+        // ส่งชื่อไฟล์กลับไปที่ไคลเอนต์
+        res.json({ filename: req.file.filename });
+    } catch (error) {
+        console.log("error", error);
+        res.status(500).send('Error uploading file');
+    }
+});
 
 const validateData = (personData) => {
     let errors = []
@@ -62,7 +90,8 @@ const validateData = (personData) => {
     return errors
 }
 
-// post api register
+// api register
+
 app.post('/api/register', async (req, res) => {
     try {
         let person = req.body
@@ -128,6 +157,7 @@ app.post('/api/register', async (req, res) => {
     }
 })
 
+
 // api login
 
 app.post("/api/login", async (req, res) => {
@@ -184,6 +214,11 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
+
+
+
+// api save profile
+
 app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
     try {
         const KU_email = req.params.KU_email;
@@ -196,6 +231,13 @@ app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
         if (results.length === 0) {
             return res.status(404).json({ message: "ไม่พบผู้ใช้" });
         }
+
+        let personData = {
+            first_name: person.first_name,
+            last_name: person.last_name,
+            status: person.status,
+            profile_image: person.profile_image
+        };
 
         // Handle password update if old password is provided
         if (person.old_password !== person.new_password) {
@@ -210,7 +252,7 @@ app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
                     const passwordHash = await bcrypt.hash(person.new_password, 10);
                     personData.password = passwordHash; // เพิ่มรหัสผ่านใหม่ที่แฮชเข้าไป
                 } else if (!match) {
-                    return res.status(401).json({ message: "รหัสผ่านเก่ไม่ถูกต้อง" });
+                    return res.status(401).json({ message: "รหัสผ่านเก่าไม่ถูกต้อง" });
                 }
             }
         } else {
@@ -220,12 +262,6 @@ app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
         }
 
         // อัปเดตข้อมูลพื้นฐาน
-        const personData = {
-            first_name: person.first_name,
-            last_name: person.last_name,
-            status: person.status,
-            profile_image: person.profile_image
-        };
 
         await conn.query('UPDATE person SET ? WHERE KU_email = ?', [personData, KU_email]);
 
@@ -255,8 +291,51 @@ app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
     }
 });
 
+app.patch('/api/edit-status', async (req, res) => {
+    try {
+        const person = {
+            status: req.body.status
+        }
+        const KU_email = req.body.KU_email
 
-// api เพิ่ม booking
+        // ตรวจสอบผู้ใช้ที่มี email นี้
+        await conn.query("UPDATE person SET ? WHERE KU_email = ?", [person, KU_email]);
+        const results = await conn.query("SELECT * from person WHERE KU_email = ?", [KU_email]);
+        res.json({
+            message: 'Edit status successful',
+            user: results[0]
+        });
+
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({
+            message: "มีบางอย่างผิดพลาด",
+        });
+    }
+});
+
+
+
+
+app.get('/api/get-all-user', async (req, res) => {
+    try {
+        const result = await conn.query("SELECT * FROM person");
+        res.send({ message: "get all user",
+            user: result[0]
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+
+
+
+
+
+
+// api room available
 
 app.post('/api/room-available', async (req, res) => {
     const room = req.body;
@@ -265,7 +344,8 @@ app.post('/api/room-available', async (req, res) => {
 
     const roomData = {
         date: room.date,
-        time: room.time
+        time: room.time,
+        booking_id: room.booking_id
     };
 
     try {
@@ -276,6 +356,11 @@ app.post('/api/room-available', async (req, res) => {
         res.status(500).send({ message: "Internal server error" });
     }
 });
+
+
+
+
+
 
 // api เช็ก booking ในแต่ละวัน
 

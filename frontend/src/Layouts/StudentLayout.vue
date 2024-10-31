@@ -8,6 +8,8 @@ import { useUserStore } from '@/stores/user'
   const userStore = useUserStore()
 
 const route = useRoute()
+const currentImage = ref(`@/assets/${userStore.selectedUser.profile_image}`)
+console.log(currentImage.value)
 
 const pageData = [
     {
@@ -54,7 +56,7 @@ const logout = () => {
           <div>
             <div class="avatar">
                 <div class="w-16 rounded-full border">
-                    <img src="@/assets/Piglet.webp" alt="">
+                    <img :src="currentImage" alt="">
                 </div>
             </div>
             {{ userStore.selectedUser.first_name }}

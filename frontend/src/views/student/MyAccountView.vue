@@ -3,6 +3,9 @@ import StudentLayout from '@/Layouts/StudentLayout.vue'
 import BookingCard from '@/components/BookingCard.vue'
 import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/user';
+import axios from 'axios';
+
+const BASE_URL = 'http://localhost:8000'
 
 const statuses = ['Profile', 'Competition', 'Chang password']
 
@@ -23,22 +26,60 @@ const changeSelectedStatus = ((newStatus) => {
     selectedStatus.value = newStatus
 })
 
+
 const first_name = ref(userStore.selectedUser.first_name)
 const last_name = ref(userStore.selectedUser.last_name)
 const phone_number = ref(userStore.selectedUser.phone_number)
-const profile_image = ref(userStore.selectedUser.profile_image)
+const imageUrl = ref('')
+const currentImage = ref(`@/assets/${userStore.selectedUser.profile_image}`)
+
+
 const new_password = ref('')
 const old_password = ref('')
 
+let image
+
+const onFileChange = (event) => {
+  const file = event.target.files[0];
+  image = file
+  console.log(file) // รับไฟล์ที่อัปโหลด
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      imageUrl.value = e.target.result;
+        // ตั้งค่า URL ของภาพเป็นผลลัพธ์ของ FileReader
+    };
+    reader.readAsDataURL(file); // อ่านไฟล์เป็น Data URL
+  }
+};
+
+const removeImage = () => {
+  imageUrl.value = ''; // ล้าง URL ของภาพเพื่อยกเลิกการแสดงพรีวิว
+};
 
 const editData = async () => {
     const userData = {
     first_name: first_name,
     last_name: last_name,
     phone_number: phone_number,
-    profile_image: profile_image,
     new_password: new_password,
     old_password: old_password
+    }
+    if (imageUrl.value !== '') {
+        const formData = new FormData();
+        formData.append('KU', image);
+
+            try {
+                const response = await axios.post(`${BASE_URL}/api/upload`, formData);
+                console.log(response);
+                // ตั้งค่า profile_image ของนักเรียนเป็นชื่อไฟล์ที่ส่งกลับมา
+                userData.profile_image = response.data.filename; // ปรับบรรทัดนี้
+            } catch (error) {
+                console.log('error', error);
+                return alert('Error uploading image');
+            }
+    } else {
+        userData.profile_image = userStore.selectedUser.profile_image
     }
     try {
         await userStore.editUser(userData);
@@ -46,6 +87,8 @@ const editData = async () => {
         console.log('error', error);
     }
 };
+
+
 
 </script>
 
@@ -73,7 +116,8 @@ const editData = async () => {
                     </div>
                     <div class="avatar flex justify-center my-5">
                         <div class="w-36 rounded-full border">
-                            <img src="@/assets/Piglet.webp" alt="">
+                            <img v-if="imageUrl" :src="imageUrl" alt="Uploaded Image">
+                            <img v-else :src="currentImage" alt="Profile Image">
                         </div>
                     </div>
                     <div>
@@ -81,9 +125,9 @@ const editData = async () => {
                             <label class="btn border-gray-300 m-5 cursor-pointer"> <!-- ใช้ label เพื่อให้คลิกได้ -->
                                 <img src="@/assets/icon-upload.png" alt="">
                                 Upload
-                                <input type="file" class="hidden" /> <!-- ซ่อน input จริง -->
+                                <input type="file" class="hidden" @change="onFileChange"/> <!-- ซ่อน input จริง -->
                             </label>
-                            <button class="btn border-gray-300 m-5">
+                            <button class="btn border-gray-300 m-5" @click="removeImage">
                                 <img src="@/assets/icon-bin.png" alt="">
                                 Delete
                             </button>
@@ -229,7 +273,7 @@ const editData = async () => {
                         </div>
                     </div>
                     <div class="flex justify-center">
-                        <input type="text" class="input input-bordered w-96 mt-5"/>
+                        <input type="password" class="input input-bordered w-96 mt-5" v-model="old_password"/>
                     </div>
                     <div class="flex justify-center text-gray-500 mt-5">
                         รหัสผ่านของคุณต้องมีความยาวอย่างน้อย 8 ตัวอักษร
@@ -243,7 +287,7 @@ const editData = async () => {
                         </div>
                     </div>
                     <div class="flex justify-center">
-                        <input type="text" class="input input-bordered w-96 mt-5"/>
+                        <input type="password" class="input input-bordered w-96 mt-5" v-model="new_password"/>
                     </div>
                     <div class="flex justify-center">
                         <button class="btn custom-change-btn w-36 mt-11 mb-14" @click="editData">

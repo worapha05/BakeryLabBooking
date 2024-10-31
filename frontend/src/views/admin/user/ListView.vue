@@ -1,57 +1,31 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
+import { useUserStore } from '@/stores/user';
 
-const userList = ref([
-    {
-        KU_email: "phaptawan.su@ku.th",
-        first_name: "Phaptawan",
-        last_name: "Sukhum",
-        role: "student",
-        status: "enabled",
-        profile_image: "@/assets/default-user.png"
-    },
-    {
-        KU_email: "admin@ku.th",
-        first_name: "admin",
-        last_name: "admin",
-        role: "admin",
-        status: "enabled",
-        profile_image: "@/assets/default-user.png"
-    },
-    {
-        KU_email: "professor1.su@ku.th",
-        first_name: "Professer1",
-        last_name: "Su",
-        role: "professor",
-        status: "enabled",
-        profile_image: "@/assets/default-user.png"
-    },
-    {
-        KU_email: "professor2.su@ku.th",
-        first_name: "Professer2",
-        last_name: "Su",
-        role: "professor",
-        status: "disabled",
-        profile_image: "@/assets/default-user.png"
-    }
-])
+const userStore = useUserStore()
 
 const selectedUserType = ref('')
 const searchEmail = ref('')
-const selectedUser = ref(null)
 
 const filteredUsers = computed(() => {
-    return userList.value.filter(user => {
+    return userStore.list.filter(user => {
         const matchesType = selectedUserType.value === 'all' || selectedUserType.value === '' || selectedUserType.value === user.role
         const matchesEmail = searchEmail.value ? user.KU_email.includes(searchEmail.value) : true
         return matchesType && matchesEmail
     })
 })
 
+onMounted(async () => {
+  await userStore.loadUser()
+  console.log(userStore.list) 
+})
+
 // ฟังก์ชันเพื่อสลับสถานะ
-const changeStatusUser = (user) => {
+const changeStatusUser = async (user) => {
     user.status = user.status === 'enabled' ? 'disabled' : 'enabled'
+    await userStore.editStatus(user)
+    await userStore.loadUser()
 }
 
 </script>
