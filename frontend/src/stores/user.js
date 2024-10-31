@@ -6,7 +6,8 @@ const BASE_URL = 'http://localhost:8000'
 export const useUserStore = defineStore('user', {
   state: () => ({
     selectedUser: {},
-    isLogin: false
+    isLogin: false,
+    list: []
   }),
   actions: {
     async login(email, password) {
@@ -39,6 +40,26 @@ export const useUserStore = defineStore('user', {
       try {
         const response = await axios.patch(`${BASE_URL}/api/profile-save-change/${this.selectedUser.KU_email}`, user)
         alert("แก้ไขสำเร็จ")
+      } catch (error) {
+        console.error('update error:', error)
+        alert(error.response.data.message);
+      }
+    },
+    async loadUser() {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/get-all-user`)
+        const message = response.data.message
+        this.list = response.data.user
+      } catch (error) {
+        console.error('Login error:', error)
+        alert(error.response.data.message);
+      }
+    },
+    async editStatus(user) {
+      try {
+        const response = await axios.patch(`${BASE_URL}/api/edit-status`, user)
+        this.selectedUser = response.data.user
+        console.log(response)
       } catch (error) {
         console.error('Login error:', error)
         alert(error.response.data.message);

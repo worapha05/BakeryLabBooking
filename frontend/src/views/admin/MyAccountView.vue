@@ -16,14 +16,20 @@ const changeSelectedStatus = ((newStatus) => {
 const first_name = ref(userStore.selectedUser.first_name)
 const last_name = ref(userStore.selectedUser.last_name)
 const phone_number = ref(userStore.selectedUser.phone_number)
-const profile_image = ref(userStore.selectedUser.profile_image)
+const new_password = ref('')
+const old_password = ref('')
+const currentImage = ref(`@/assets/${userStore.selectedUser.profile_image}`)
+console.log
 
 const editData = async () => {
+    
     const userData = {
-    first_name: first_name,
-    last_name: last_name,
-    phone_number: phone_number,
-    profile_image: profile_image
+        first_name: first_name,
+        last_name: last_name,
+        phone_number: phone_number,
+        new_password: new_password,
+        old_password: old_password,
+        profile_image: userStore.selectedUser.profile_image
     }
     try {
         await userStore.editUser(userData);
@@ -31,6 +37,9 @@ const editData = async () => {
         console.log('error', error);
     }
 };
+
+
+
 
 </script>
 
@@ -58,7 +67,7 @@ const editData = async () => {
                     </div>
                     <div class="avatar flex justify-center mt-10 my-5">
                         <div class="w-36 rounded-full border">
-                            <img src="@/assets/Piglet.webp" alt="">
+                            <img :src="currentImage" alt="">
                         </div>
                     </div>
                     <div class="flex justify-center">
@@ -127,7 +136,7 @@ const editData = async () => {
                         </div>
                     </div>
                     <div class="flex justify-center">
-                        <input type="password" class="input input-bordered w-96 mt-5"/>
+                        <input type="password" class="input input-bordered w-96 mt-5" v-model="old_password"/>
                     </div>
                     <div class="flex justify-center text-gray-500 mt-5">
                         รหัสผ่านของคุณต้องมีความยาวอย่างน้อย 8 ตัวอักษร
@@ -141,10 +150,10 @@ const editData = async () => {
                         </div>
                     </div>
                     <div class="flex justify-center">
-                        <input type="password" class="input input-bordered w-96 mt-5"/>
+                        <input type="password" class="input input-bordered w-96 mt-5" v-model="new_password"/>
                     </div>
                     <div class="flex justify-center">
-                        <button class="btn custom-change-btn w-36 mt-11 mb-14">
+                        <button class="btn custom-change-btn w-36 mt-11 mb-14" @click="editData">
                             ยืนยัน
                         </button>
                     </div>

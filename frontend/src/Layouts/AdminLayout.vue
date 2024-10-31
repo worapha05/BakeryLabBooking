@@ -6,6 +6,8 @@ import NavbarLogin from '@/components/NavbarLogin.vue'
 import { useUserStore } from '@/stores/user'
   
 const userStore = useUserStore()
+const currentImage = ref(`@/assets/${userStore.selectedUser.profile_image}`)
+console.log(currentImage.value)
 
 const route = useRoute()
 
@@ -59,7 +61,7 @@ const logout = () => {
           <div>
             <div class="avatar">
                 <div class="w-16 rounded-full border">
-                    <img src="@/assets/Piglet.webp" alt="">
+                    <img :src="currentImage" alt="">
                 </div>
             </div>
             Admin

@@ -1,15 +1,34 @@
 <script setup>
 import NavbarLogin from '@/components/NavbarLogin.vue'
 import { ref } from 'vue';
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 
-const imageUrl = ref('');
+const router = useRouter()
+
+const BASE_URL = 'http://localhost:8000'
+
+const first_name = ref('')
+const last_name = ref('')
+const student_id = ref('')
+const department = ref('')
+const KU_email = ref('')
+const phone_number = ref('')
+const password = ref('')
+const confirm_password = ref('')
+const imageUrl = ref('')
+
+let image = null
 
 const onFileChange = (event) => {
-  const file = event.target.files[0]; // รับไฟล์ที่อัปโหลด
+  const file = event.target.files[0];
+  image = file
+  console.log(file) // รับไฟล์ที่อัปโหลด
   if (file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-      imageUrl.value = e.target.result; // ตั้งค่า URL ของภาพเป็นผลลัพธ์ของ FileReader
+      imageUrl.value = e.target.result;
+        // ตั้งค่า URL ของภาพเป็นผลลัพธ์ของ FileReader
     };
     reader.readAsDataURL(file); // อ่านไฟล์เป็น Data URL
   }
@@ -17,6 +36,45 @@ const onFileChange = (event) => {
 
 const removeImage = () => {
   imageUrl.value = ''; // ล้าง URL ของภาพเพื่อยกเลิกการแสดงพรีวิว
+};
+
+const register = async () => {
+  if (password.value !== confirm_password.value) {
+    return alert("รหัสผ่านไม่ตรงกัน")
+  } else {
+    let student = {
+        first_name: first_name.value,
+        last_name: last_name.value,
+        student_id: student_id.value,
+        department: department.value,
+        KU_email: KU_email.value,
+        phone_number: phone_number.value,
+        password: password.value,
+        role: "student"
+    }
+    if (imageUrl.value !== '') {
+        const formData = new FormData();
+        formData.append('KU', image);
+
+            try {
+                const response = await axios.post(`${BASE_URL}/api/upload`, formData);
+                console.log(response);
+                // ตั้งค่า profile_image ของนักเรียนเป็นชื่อไฟล์ที่ส่งกลับมา
+                student.profile_image = response.data.filename; // ปรับบรรทัดนี้
+            } catch (error) {
+                console.log('error', error);
+                return alert('Error uploading image');
+            }
+    } else {
+        student.profile_image = "default-user.jpg"
+    }
+    try {
+        await axios.post(`${BASE_URL}/api/register`, student)
+        router.push('/login');
+    } catch (error) {
+        alert(error.response.data.message)
+    }
+  } // ล้าง URL ของภาพเพื่อยกเลิกการแสดงพรีวิว
 };
 
 </script>
@@ -55,13 +113,13 @@ const removeImage = () => {
             </div>
             <div>
                 <div class="flex justify-center">
-                    <input type="text" placeholder="Name" class="input input-bordered w-full max-w-xs my-5" />
-                    <input type="text" placeholder="Surname" class="input input-bordered w-full max-w-xs ml-20 my-5" />
+                    <input type="text" placeholder="Name" class="input input-bordered w-full max-w-xs my-5" v-model="first_name" />
+                    <input type="text" placeholder="Surname" class="input input-bordered w-full max-w-xs ml-20 my-5" v-model="last_name" />
                 </div>
                 <div class="flex justify-center">
-                    <input type="text" placeholder="Student ID" class="input input-bordered w-full max-w-xs my-5" />
+                    <input type="text" placeholder="Student ID" class="input input-bordered w-full max-w-xs my-5" v-model="student_id"/>
                     <label class="input input-bordered flex items-center w-80 ml-20 my-5 relative"> <!-- เพิ่ม relative เพื่อให้ลูกศรอยู่ในตำแหน่งที่ถูกต้อง -->
-                        <select class="custom-select grow">
+                        <select class="custom-select grow" v-model="department">
                             <option value="" disabled selected>เลือกสาขาที่เรียน</option>
                             <option value="เทคโนโลยีอุตสาหกรรมเกษตร">เทคโนโลยีอุตสาหกรรมเกษตร</option>
                             <option value="เทคโนโลยีชีวภาพ">เทคโนโลยีชีวภาพ</option>
@@ -82,13 +140,13 @@ const removeImage = () => {
                     <div class="my-5">
                         Email
                     </div>
-                    <input type="text" placeholder="Email" class="input input-bordered w-80" />
+                    <input type="text" placeholder="Email" class="input input-bordered w-80" v-model="KU_email"/>
                 </div>
                 <div>
                     <div class="my-5 ml-20">
                         Phone
                     </div>
-                    <input type="text" placeholder="Phone" class="input input-bordered w-80 ml-20" />
+                    <input type="text" placeholder="Phone" class="input input-bordered w-80 ml-20" v-model="phone_number"/>
                 </div>
             </div>
             <div class="mt-10 mx-52 font-bold">
@@ -99,19 +157,19 @@ const removeImage = () => {
                     <div class="my-5">
                         Password
                     </div>
-                    <input type="text" placeholder="รหัสผ่าน" class="input input-bordered w-80" />
+                    <input type="password" placeholder="รหัสผ่าน" class="input input-bordered w-80" v-model="password"/>
                 </div>
                 <div>
                     <div class="my-5 ml-20">
                         Confirm password
                     </div>
-                    <input type="text" placeholder="ยืนยันรหัสผ่าน" class="input input-bordered w-80 ml-20" />
+                    <input type="password" placeholder="ยืนยันรหัสผ่าน" class="input input-bordered w-80 ml-20" v-model="confirm_password"/>
                 </div>
             </div>
             <div class="create-account-btn my-10 flex justify-center">
-                <RouterLink to="/login" class="btn custom-create-account-btn mt-2">
+                <button @click="register" class="btn custom-create-account-btn mt-2">
                     สร้างบัญชี
-                </RouterLink>
+                </button>
             </div>
         </div>
     </div>
