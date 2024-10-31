@@ -12,6 +12,7 @@ import AdminEquipmentListView from '@/views/admin/equipment/ListView.vue'
 import AdminUpdateEquipmentView from '@/views/admin/equipment/UpdateView.vue'
 import AdminMyAccountView from '@/views/admin/MyAccountView.vue'
 import AdminUseRoomView from '@/views/admin/user/UseRoomView.vue'
+import AdminUseRoomTableView from '@/views/admin/user/UseRoomTableView.vue'
 
 // student site
 
@@ -93,6 +94,11 @@ const router = createRouter({
       path: '/admin/use-room',
       name: 'admin-use-room',
       component: AdminUseRoomView
+    },
+    {
+      path: '/admin/use-room-table',
+      name: 'admin-use-room-table',
+      component: AdminUseRoomTableView
     },
     {
       path: '/admin/use-room',

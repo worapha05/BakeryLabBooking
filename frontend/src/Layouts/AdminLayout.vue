@@ -11,6 +11,10 @@ const route = useRoute()
 
 const pageData = [
     {
+        name: 'ตารางการเข้าใช้ห้อง',
+        route: '/admin/use-room-table',
+    },
+    {
         name: 'การเข้าใช้ห้อง',
         route: '/admin/use-room',
     },

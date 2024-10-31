@@ -8,7 +8,8 @@ const bookingDetail = [
     {
         bookingId: "1",
             date: "จองห้องวันที่ 26/10/2024",
-            time: "เวลา 9.00 ถึง 12.00",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "รอการอนุมัติ",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -17,7 +18,8 @@ const bookingDetail = [
     {
         bookingId: "2",
             date: "จองห้องวันที่ 26/10/2024",
-            time: "เวลา 9.00 ถึง 12.00",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "รอการอนุมัติ",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -26,7 +28,8 @@ const bookingDetail = [
     {
         bookingId: "3",
             date: "จองห้องวันที่ 26/10/2024",
-            time: "เวลา 9.00 ถึง 12.00",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "อนุมัติแล้ว",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -35,7 +38,8 @@ const bookingDetail = [
     {
         bookingId: "4",
             date: "จองห้องวันที่ 26/10/2024",
-            time: "เวลา 9.00 ถึง 12.00",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "ยกเลิก",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -43,7 +47,8 @@ const bookingDetail = [
     },{
         bookingId: "5",
             date: "จองห้องวันที่ 26/10/2024",
-            time: "เวลา 9.00 ถึง 12.00",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "อนุมัติแล้ว",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -90,7 +95,8 @@ const changeSelectedStatus = ((newStatus) => {
                         <BookingCard v-for="list in filterBooingList"
                         :bookingId= list.bookingId
                         :date= list.date
-                        :time= list.time
+                        :time_start= list.time_start
+                        :time_end= list.time_end
                         :usage= list.usage
                         :status= list.status
                         :lastAction= list.lastAction

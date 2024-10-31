@@ -7,8 +7,9 @@ const statuses = ['อยู่ระหว่างการใช้', 'ใช
 const bookingDetail = [
     {
         bookingId: "1",
-            date: "30/10/2024",
-            time: "เวลา 9.00 ถึง 12.00",
+            date: "31/10/2024",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "อนุมัติแล้ว",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -17,7 +18,8 @@ const bookingDetail = [
     {
         bookingId: "2",
             date: "01/10/2024",
-            time: "เวลา 9.00 ถึง 12.00",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "อนุมัติแล้ว",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -26,7 +28,8 @@ const bookingDetail = [
     {
         bookingId: "3",
             date: "02/10/2024",
-            time: "เวลา 9.00 ถึง 12.00",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "อนุมัติแล้ว",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -35,7 +38,8 @@ const bookingDetail = [
     {
         bookingId: "4",
             date: "02/10/2024",
-            time: "เวลา 11.00 ถึง 12.00",
+            time_start: "9:00",
+            time_end: "12:00",
             usage: "ใช้เพื่อการแข่งขัน",
             status: "รอการอนุมัติ",
             lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -107,7 +111,8 @@ const changeSelectedStatus = ((newStatus) => {
                     <BookingCard v-for="list in filterBooingList"
                         :bookingId= list.bookingId
                         :date= list.date
-                        :time= list.time
+                        :time_start= list.time_start
+                        :time_end= list.time_end
                         :usage= list.usage
                         :status= list.status
                         :lastAction= list.lastAction
@@ -119,7 +124,8 @@ const changeSelectedStatus = ((newStatus) => {
                     <BookingCard v-for="list in filterPartBooingList"
                     :bookingId= list.bookingId
                     :date= list.date
-                    :time= list.time
+                    :time_start= list.time_start
+                    :time_end= list.time_end
                     :usage= list.usage
                     :status= list.status
                     :lastAction= list.lastAction
