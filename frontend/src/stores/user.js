@@ -57,7 +57,7 @@ export const useUserStore = defineStore('user', {
     },
     async editStatus(user) {
       try {
-        const response = await axios.patch(`${BASE_URL}/api/edit-status`, user)
+        const response = await axios.patch(`${BASE_URL}/api/edit-status-user`, user)
         this.selectedUser = response.data.user
         console.log(response)
       } catch (error) {

@@ -1,69 +1,31 @@
 <script setup>
 import StudentLayout from '@/Layouts/StudentLayout.vue'
 import BookingCard from '@/components/BookingCard.vue'
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
+import { useBookingStore } from '@/stores/booking';
+import { useUserStore } from '@/stores/user';
 
-const statuses = ['อนุมัติแล้ว', 'รอการอนุมัติ', 'ยกเลิก']
-const bookingDetail = [
-    {
-        bookingId: "1",
-            date: "จองห้องวันที่ 26/10/2024",
-            time_start: "9:00",
-            time_end: "12:00",
-            usage: "ใช้เพื่อการแข่งขัน",
-            status: "รอการอนุมัติ",
-            lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
-            icon: "../assets/images/882d0c62-fac0-4a78-9844-8f16fff17a01.png"
-    },
-    {
-        bookingId: "2",
-            date: "จองห้องวันที่ 26/10/2024",
-            time_start: "9:00",
-            time_end: "12:00",
-            usage: "ใช้เพื่อการแข่งขัน",
-            status: "รอการอนุมัติ",
-            lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
-            icon: "../assets/images/882d0c62-fac0-4a78-9844-8f16fff17a01.png"
-    },
-    {
-        bookingId: "3",
-            date: "จองห้องวันที่ 26/10/2024",
-            time_start: "9:00",
-            time_end: "12:00",
-            usage: "ใช้เพื่อการแข่งขัน",
-            status: "อนุมัติแล้ว",
-            lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
-            icon: "../assets/images/882d0c62-fac0-4a78-9844-8f16fff17a01.png"
-    },
-    {
-        bookingId: "4",
-            date: "จองห้องวันที่ 26/10/2024",
-            time_start: "9:00",
-            time_end: "12:00",
-            usage: "ใช้เพื่อการแข่งขัน",
-            status: "ยกเลิก",
-            lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
-            icon: "../assets/images/882d0c62-fac0-4a78-9844-8f16fff17a01.png"
-    },{
-        bookingId: "5",
-            date: "จองห้องวันที่ 26/10/2024",
-            time_start: "9:00",
-            time_end: "12:00",
-            usage: "ใช้เพื่อการแข่งขัน",
-            status: "อนุมัติแล้ว",
-            lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
-            icon: "../assets/images/882d0c62-fac0-4a78-9844-8f16fff17a01.png"
-    }
-]
+const userStore = useUserStore()
 
-const selectedStatus = ref("รอการอนุมัติ")
-const filterBooingList = computed(() => {
-    return bookingDetail.filter(booking => booking.status === selectedStatus.value)
+const bookingStore= useBookingStore()
+
+const statuses = ['อนุมัติ', 'รออนุมัติ', 'ถูกยกเลิก']
+
+const selectedStatus = ref("รออนุมัติ")
+const filterBookingList = computed(() => {
+    return bookingStore.list.filter(booking => booking.booking_status === selectedStatus.value)
 })
 
 const changeSelectedStatus = ((newStatus) => {
     selectedStatus.value = newStatus
 })
+
+onMounted(async () => {
+  await bookingStore.loadBooking(userStore.selectedUser.student_id)
+  console.log('Loaded Bookings:', bookingStore.list);
+    console.log('Current Selected Status:', selectedStatus.value);
+})
+
 
 </script>
 <template>
@@ -81,7 +43,7 @@ const changeSelectedStatus = ((newStatus) => {
             <div class="h-[0.5px] w-full bg-gray-300"></div>
         </div>
 
-        <div v-if="bookingDetail.length > 0">
+        <div v-if="filterBookingList.length > 0">
                         <div class="main-container w-auto bg-white shadow-lg mx-6 relative my-0 p-4">
                         <!-- Header Section  -->
                         <div class="flex">
@@ -91,16 +53,16 @@ const changeSelectedStatus = ((newStatus) => {
                                 </div>
                             </div>
                             <span class="text-4xl mt-2">รายการ</span>
-                        </div> 
-                        <BookingCard v-for="list in filterBooingList"
-                        :bookingId= list.bookingId
-                        :date= list.date
-                        :time_start= list.time_start
-                        :time_end= list.time_end
-                        :usage= list.usage
-                        :status= list.status
-                        :lastAction= list.lastAction
-                        :icon= list.icon
+                        </div>
+                        <BookingCard v-for="list in filterBookingList"
+                        :bookingId= list.booking_id
+                        :date= list.usage_date 
+                        :time_start= list.usage_time_start
+                        :time_end= list.usage_time_end
+                        :usage= list.use_category
+                        :status= list.booking_status
+                        :lastAction= list.booking_datetime
+                        icon= "@/assets/default-user.jpg"
                         ></BookingCard>
                 
                     

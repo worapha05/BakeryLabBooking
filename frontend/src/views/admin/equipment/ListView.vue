@@ -1,46 +1,30 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
+import { useEquipmentStore } from '@/stores/equipment';
 
-const equipmentList = ref([
-    {
-        equipment_id: "1",
-        equipment_name: "เครื่องนวดแป้ง",
-        equipment_status: "operational",
-        date: "30/10/2024",
-        time: "9.00 - 12.00"
-    },
-    {
-        equipment_id: "2",
-        equipment_name: "เครื่องชั่ง",
-        equipment_status: "operational",
-        date: "31/10/2024",
-        time: "9.00 - 12.00"
-    },
-    {
-        equipment_id: "3",
-        equipment_name: "เตาอบไฟฟ้า",
-        equipment_status: "broken",
-        date: "31/10/2024",
-        time: "9.00 - 12.00"
-    }
-])
+const equipmentStore = useEquipmentStore()
+
+
+const equipment = ref('')
 
 const searchEquipment = ref('')
 const showAddEquipment = ref(false)
 
 const filteredEquipment = computed(() => {
-    return equipmentList.value.filter(equipment => {
+    return equipmentStore.list.filter(equipment => {
         if (searchEquipment.value) {
-            return equipment.equipment_id.includes(searchEquipment.value);
+            return equipment.equipment_id.toString().includes(searchEquipment.value);
         }
         return true;
     })
 })
 
 // ฟังก์ชันเพื่อสลับสถานะของอุปกรณ์
-const changeStatusEquipment = (equipment) => {
+const changeStatusEquipment = async (equipment) => {
     equipment.equipment_status = equipment.equipment_status === 'operational' ? 'broken' : 'operational';
+    await equipmentStore.editStatus(equipment)
+    await equipmentStore.loadEquipment()
 }
 
 const startAddingEquipment = () => {
@@ -49,6 +33,16 @@ const startAddingEquipment = () => {
 
 const backToEquip = () => {
     showAddEquipment.value = false; // เปลี่ยนสถานะเมื่อกดปุ่ม
+};
+
+onMounted(async () => {
+  await equipmentStore.loadEquipment()
+  console.log(equipmentStore.list) 
+})
+
+const addEquipmentData = async () => {
+    await equipmentStore.addEquipment(equipment.value)
+    await equipmentStore.loadEquipment() // เปลี่ยนสถานะเมื่อกดปุ่ม
 };
 
 </script>
@@ -114,9 +108,9 @@ const backToEquip = () => {
                     <div class="ml-12 my-5">
                         ชื่ออุปกรณ์
                     </div>
-                    <input type="text" placeholder="" class="input input-bordered w-96 ml-12"/>
+                    <input type="text" placeholder="" class="input input-bordered w-96 ml-12" v-model="equipment"/>
                     <div>
-                        <button class="btn custom-change-btn w-36 ml-12 mt-12 mb-48">
+                        <button class="btn custom-change-btn w-36 ml-12 mt-12 mb-48" @click="addEquipmentData">
                             บันทึก
                         </button>
                     </div>

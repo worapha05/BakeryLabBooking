@@ -291,7 +291,21 @@ app.patch('/api/profile-save-change/:KU_email', async (req, res) => {
     }
 });
 
-app.patch('/api/edit-status', async (req, res) => {
+
+
+app.get('/api/get-all-user', async (req, res) => {
+    try {
+        const result = await conn.query("SELECT * FROM person");
+        res.send({ message: "get all user",
+            user: result[0]
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+
+app.patch('/api/edit-status-user', async (req, res) => {
     try {
         const person = {
             status: req.body.status
@@ -302,7 +316,7 @@ app.patch('/api/edit-status', async (req, res) => {
         await conn.query("UPDATE person SET ? WHERE KU_email = ?", [person, KU_email]);
         const results = await conn.query("SELECT * from person WHERE KU_email = ?", [KU_email]);
         res.json({
-            message: 'Edit status successful',
+            message: 'Edit status user successful',
             user: results[0]
         });
 
@@ -315,14 +329,126 @@ app.patch('/api/edit-status', async (req, res) => {
     }
 });
 
-
-
-
-app.get('/api/get-all-user', async (req, res) => {
+app.get('/api/get-all-equipment', async (req, res) => {
     try {
-        const result = await conn.query("SELECT * FROM person");
+        const result = await conn.query("SELECT * FROM bakery_equipment");
         res.send({ message: "get all user",
-            user: result[0]
+            equipment: result[0]
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+
+// api update สถานะ เครื่อง
+
+app.patch('/api/edit-status-equipment', async (req, res) => {
+    try {
+        const equipment = {
+            equipment_status: req.body.equipment_status
+        }
+        const equipment_id = req.body.equipment_id
+
+        // ตรวจสอบผู้ใช้ที่มี email นี้
+        await conn.query("UPDATE bakery_equipment SET ? WHERE equipment_id = ?", [equipment, equipment_id]);
+        const results = await conn.query("SELECT * from bakery_equipment WHERE equipment_id = ?", [equipment_id]);
+        res.json({
+            message: 'Edit status equipment successful',
+            equipment: results[0]
+        });
+
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({
+            message: "มีบางอย่างผิดพลาด",
+        });
+    }
+});
+
+app.post('/api/add-equipment', async (req, res) => {
+    try {
+        const equipment = req.body
+        const result = await conn.query("INSERT INTO bakery_equipment SET ?", [equipment]);
+        res.send({ message: "เพิ่มอุปกรณ์เรียบร้อย"
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+
+app.post('/api/add-booking-request', async (req, res) => {
+    try {
+        const booking = req.body
+        const result = await conn.query("INSERT INTO booking SET ?", [booking]);
+        res.send({ message: "เพิ่มคำขอสำเร็จ",
+            bookingId: result[0].insertId
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "เพิ่มไม่สำเร็จ" });
+    }
+});
+
+app.post('/api/add-booking-list', async (req, res) => {
+    try {
+        console.log('Received booking list data:', req.body);
+        const booking = req.body
+        const result = await conn.query("INSERT INTO booking_list SET ?", [booking]);
+        res.send({ message: "เพิ่มสมาชิกสำเร็จ",
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "เพิ่มไม่สำเร็จ" });
+    }
+});
+
+app.post('/api/add-used_equipment', async (req, res) => {
+    try {
+        console.log('Received used equipment data:', req.body);
+        const equipment_id = req.body.equipment_id
+        let eqiuipment = req.body
+        try {
+            console.log(equipment_id)
+            let results = await conn.query("SELECT equipment_name FROM bakery_equipment WHERE equipment_id = ?", equipment_id)
+            console.log("Query Results:", results);
+            console.log(results[0])
+            console.log(results[0][0].equipment_name)
+            eqiuipment.equipment_name = results[0][0].equipment_name
+            
+        } catch (error) {
+            console.error("หาเครื่องมือไม่เจอ")
+        }
+        const result = await conn.query("INSERT INTO used_equipment SET ?", [eqiuipment]);
+        res.send({ message: "เพิ่มเครื่องมือสำเร็จ",
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "เพิ่มไม่สำเร็จ" });
+    }
+});
+
+app.get('/api/get-request/:id', async (req, res) => {
+    try {
+        const student_id = req.params.id; // Use req.query to get the student_id
+        console.log(student_id)
+        let result = await conn.query("SELECT booking_id FROM booking_list WHERE student_id = ?", [student_id]);
+        console.log(result[0])
+        booking = result[0]
+        request = []
+        for (let i = 0; i < booking.length; i++) {
+            try {
+                let results = await conn.query("SELECT * FROM booking WHERE booking_id = ?", [booking[i].booking_id]);
+                console.log(results[0].flat())
+                request.push(results[0].flat())
+            } catch (error) {
+                console.error("หาคำขอไม่เจอ")
+            }
+        }
+        res.send({ message: "get all request",
+            request: request
         });
     } catch (error) {
         console.error('Error inserting room availability:', error);
