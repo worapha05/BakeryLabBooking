@@ -19,7 +19,7 @@ const phone_number = ref(userStore.selectedUser.phone_number)
 const new_password = ref('')
 const old_password = ref('')
 const currentImage = ref(`@/assets/${userStore.selectedUser.profile_image}`)
-console.log
+console.log(currentImage.value)
 
 const editData = async () => {
     

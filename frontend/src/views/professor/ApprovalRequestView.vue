@@ -115,7 +115,7 @@ const bookingEquipment = [
     { equipment: 'ชามผสม' },
 ];
 
-const selectedStatus = ref("รอการอนุมัติ")
+const selectedStatus = ref("รออนุมัติ")
 const selectedViewProfileStatus = ref("Profile")
 const selectedBooking = ref(null)
 const selectedProfile = ref(null)
@@ -165,7 +165,7 @@ const backToComfirm = (() => {
 
 <template>
     <ProfessorLayout>
-        <div v-if="bookingDetail.length > 0">
+        <div v-if="filterBooingList.length > 0">
             <!-- ยังไม่ไ้ด้เลือก booking ไหน -->
             <div v-if="!selectedBooking">
                 <div class="my-3">

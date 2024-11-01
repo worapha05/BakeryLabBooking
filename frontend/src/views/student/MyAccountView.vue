@@ -32,6 +32,7 @@ const last_name = ref(userStore.selectedUser.last_name)
 const phone_number = ref(userStore.selectedUser.phone_number)
 const imageUrl = ref('')
 const currentImage = ref(`@/assets/${userStore.selectedUser.profile_image}`)
+console.log(currentImage.value)
 
 
 const new_password = ref('')
