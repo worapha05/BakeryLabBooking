@@ -2,8 +2,18 @@
 import ProfessorLayout from '@/Layouts/ProfessorLayout.vue'
 import BookingCard from '@/components/BookingCard.vue'
 import { computed, ref } from 'vue'
+import { useBookingStore } from '@/stores/booking';
+import { useUserStore } from '@/stores/user';
+import { onMounted } from 'vue';
 
-const statuses = ['อนุมัติแล้ว', 'รอการอนุมัติ', 'ยกเลิก']
+
+const bookingStore = useBookingStore()
+const userStore = useUserStore()
+onMounted(async () => {
+  await bookingStore.loadBookingByProfessor(userStore.selectedUser.position, userStore.selectedUser.department)
+  console.log(bookingStore.list) 
+})
+const statuses = ['อนุมัติ', 'รออนุมัติ', 'ถูกยกเลิก']
 const viewProfileStatuses = ['Profile', 'Competition', 'ประวัติการใช้ห้อง']
 const bookingDetail = [
     {
@@ -93,13 +103,13 @@ const bookingEquipment = [
     { equipment: 'ชามผสม' },
 ];
 
-const selectedStatus = ref("รอการอนุมัติ")
+const selectedStatus = ref("รออนุมัติ")
 const selectedViewProfileStatus = ref("Profile")
 const selectedBooking = ref(null)
 const selectedProfile = ref(null)
 
 const filterBooingList = computed(() => {
-    return bookingDetail.filter(booking => booking.status === selectedStatus.value)
+    return bookingStore.list.filter(booking => booking.status === selectedStatus.value)
 })
 
 const changeSelectedStatus = ((newStatus) => {
@@ -127,7 +137,7 @@ const backToList = (() => {
 
 <template>
     <ProfessorLayout>
-        <div v-if="bookingDetail.length > 0">
+        <div v-if="filterBooingList.length > 0">
             <!-- ยังไม่ไ้ด้เลือก booking ไหน -->
             <div v-if="!selectedBooking">
                 <div class="my-3">

@@ -28,7 +28,7 @@ let conn = null
 
 const initMySQL = async () => {
     conn = await mysql.createConnection({
-        port: 8889,
+        // port: 8889,
         host: 'localhost',
         user: 'root',
         password: 'root',
@@ -91,6 +91,7 @@ const validateData = (personData) => {
 }
 
 // api register
+
 
 app.post('/api/register', async (req, res) => {
     try {
@@ -455,6 +456,72 @@ app.get('/api/get-request/:id', async (req, res) => {
         res.status(500).send({ message: "Internal server error" });
     }
 });
+
+app.get('/api/get-user/:id', async (req, res) => {
+    try {
+        const student_id = req.params.id; // Use req.query to get the student_id
+        console.log(student_id)
+        let result = await conn.query("SELECT department FROM student WHERE student_id = ?", [student_id]);
+        console.log(result[0])
+        res.send({ message: "get all request",
+            department: result[0][0].department
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+
+app.post('/api/add-approval', async (req, res) => {
+    const approval = req.body;
+
+    try {
+        const results = await conn.query("INSERT INTO approval SET ?", approval);
+        res.send({ message: "add success"});
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+app.get('/api/get-request/:position/:department', async (req, res) => {
+    try {
+        const { position, department } = req.params;
+        let status;
+
+        // Determine the approval status based on position and department
+        if (position === "หัวหน้าภาควิชา" && department === "วิทยาศาสตร์และเทคโนโลยีการอาหาร") {
+            status = "2";
+        } else if (position === "หัวหน้าห้องเบเกอรี่") {
+            status = "1";
+        } else {
+            status = "0";
+        }
+
+        // Query to get booking IDs based on approval status
+        const result = await conn.query("SELECT booking_id FROM approval WHERE approval_status = ?", [status]);
+        
+        // Check if any booking IDs were found
+        if (result[0].length === 0) {
+            return res.send({ message: "No bookings found", bookings: [] });
+        }
+
+        // Retrieve booking details for each booking_id
+        const bookings = [];
+        for (const row of result[0]) {
+            const response = await conn.query("SELECT * FROM booking WHERE booking_id = ? AND department = ?", [row.booking_id, department]);
+            if (response[0].length > 0) { // Ensure there's a result before pushing
+                bookings.push(response[0]);
+            }
+        }
+
+        // Send all booking data once at the end
+        res.send({ message: "เจอ approval list", bookings });
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
+
 
 
 

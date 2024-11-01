@@ -1,6 +1,7 @@
 import { ref, computed, toRaw } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { Result } from 'postcss';
 
 
 const BASE_URL = 'http://localhost:8000'
@@ -16,6 +17,7 @@ export const useBookingStore = defineStore('booking', {
             const response = await axios.get(`${BASE_URL}/api/get-request/${student_id}`);
 
             let bookingList = response.data.request
+            console.log(bookingList)
             for (let i = 0; i < bookingList.length; i++) {
                 const booking = bookingList[i][0]; // Get the booking object
                 // Check if booking_id is already in this.list
@@ -50,6 +52,7 @@ export const useBookingStore = defineStore('booking', {
         alert(response.data.message)
         const bookingId = response.data.bookingId
         for (let member of booking.memberList) {
+          console.log(member)
             const bookingList = {
               booking_id: bookingId,
               student_id: member.studentId,
@@ -95,10 +98,48 @@ export const useBookingStore = defineStore('booking', {
               console.error("เพิ่มเครื่องมือไม่สำเร็จ"); // "Failed to add equipment"
             }
           }
+          const result = await axios.get(`${BASE_URL}/api/get-user/${booking.owner.student_id}`)
+          console.log(result.data.department)
+          const departmentName = result.data.department
+          let approval = {
+            booking_id: bookingId
+          }
+          console.log(approval)
+          if (departmentName == "วิทยาศาสตร์และเทคโนโลยีการอาหาร") {
+            approval.approval_status = "1"
+          } else {
+            approval.approval_status = "0"
+          }
+          try {
+            await axios.post(`${BASE_URL}/api/add-approval`, approval);
+          } catch (error) {
+            console.log("เพิ่มคำขออนุญาติไม่สำเร็จ", error)
+          }
     } catch (error) {
     console.error('add request error:', error);
     alert(error.response.data.message)
   }
-    }
+    }, async loadBookingByProfessor(position, department) {
+      try {
+          
+          const response = await axios.get(`${BASE_URL}/api/get-request/${position}/${department}`);
+
+          let bookingList = response.data.bookings
+          for (let i = 0; i < bookingList.length; i++) {
+              const booking = bookingList[i][0];
+              console.log(booking)
+              const isDuplicate = this.list.some(item => item.booking_id === booking.booking_id);
+              if (!isDuplicate) {
+                  this.list.push(booking); // Only push if it's not a duplicate
+                  console.log(booking); // Log the booking object
+              } else {
+                  console.log(`Booking ID ${booking.booking_id} is a duplicate and will not be added.`);
+              }
+          }
+          
+      } catch (error) {
+          console.error("ไม่เจอคำขอใด ๆ")
+      }
+  }
   }
 });

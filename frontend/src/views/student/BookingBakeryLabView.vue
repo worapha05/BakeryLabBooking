@@ -5,8 +5,12 @@ import { useBookingStore } from '@/stores/booking';
 import { useUserStore } from '@/stores/user';
 import { onMounted, ref } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router';
 
 const BASE_URL = 'http://localhost:8000'
+
+const router = useRouter()
 
 const userStore = useUserStore()
 const equipmentStore = useEquipmentStore()
