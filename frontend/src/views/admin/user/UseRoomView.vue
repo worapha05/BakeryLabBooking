@@ -9,7 +9,7 @@ const bookingDetail = [
         bookingId: "1",
         date: "31/10/2024",
         time_start: "09:00",
-        time_end: "12:00",
+        time_end: ":00",
         usage: "ใช้เพื่อการแข่งขัน",
         status: "อนุมัติแล้ว",
         lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",

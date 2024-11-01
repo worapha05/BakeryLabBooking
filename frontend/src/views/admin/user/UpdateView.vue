@@ -35,6 +35,14 @@ import AdminLayout from '@/Layouts/AdminLayout.vue'
                 <div class="flex justify-center">
                     <label class="input input-bordered flex items-center w-80 my-5 relative"> <!-- เพิ่ม relative เพื่อให้ลูกศรอยู่ในตำแหน่งที่ถูกต้อง -->
                         <select class="custom-select grow">
+                            <option value="" disabled selected>ตำแหน่ง</option>
+                            <option value="หัวหน้าภาควิชา">หัวหน้าภาควิชา</option>
+                            <option value="หัวหน้าห้องเบเกอรี่">หัวหน้าห้องเบเกอรี่</option>
+                        </select>
+                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">▼</span> <!-- เพิ่มลูกศร -->
+                    </label>
+                    <label class="input input-bordered flex items-center w-80 my-5 ml-20 relative"> <!-- เพิ่ม relative เพื่อให้ลูกศรอยู่ในตำแหน่งที่ถูกต้อง -->
+                        <select class="custom-select grow">
                             <option value="" disabled selected>สาขาที่สังกัด</option>
                             <option value="เทคโนโลยีอุตสาหกรรมเกษตร">เทคโนโลยีอุตสาหกรรมเกษตร</option>
                             <option value="เทคโนโลยีชีวภาพ">เทคโนโลยีชีวภาพ</option>
@@ -45,7 +53,6 @@ import AdminLayout from '@/Layouts/AdminLayout.vue'
                         </select>
                         <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">▼</span> <!-- เพิ่มลูกศร -->
                     </label>
-                    <div class="w-96 mx-2"></div>
                 </div>
                 <div class="mt-10 ml-32 font-bold">
                     ข้อมูลติดต่อ
