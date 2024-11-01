@@ -3,6 +3,13 @@ import { ref, computed ,  watch} from 'vue'
 import AdminLayout from '@/Layouts/AdminLayout.vue'
 import BookingCard from '@/components/BookingCard.vue'
 
+const statuses = ['การเข้าใช้ห้อง', 'เช็คความสะอาด']
+const selectedStatus = ref("การเข้าใช้ห้อง")
+
+const changeSelectedStatus = ((newStatus) => {
+    selectedStatus.value = newStatus
+})
+
 // mog Booking ที่จะถึง
 const bookingDetail = [
     {
@@ -97,96 +104,179 @@ const canShowBooking = computed(() => {
 
 <template>
     <AdminLayout>
-        <div class="my-5 mt-10">
-            <span class="text-xl font-bold ml-28">ผลการขอจอง</span>
+        <div class="ml-14">
+            <div class="my-6">
+                <a v-for="status in statuses" :key="status"
+                    :class="status === selectedStatus ? 'btn custom-blue-s ml-12' : 'btn button ml-12'"
+                    @click="changeSelectedStatus(status)">
+                    {{ status }}
+                 </a>
+            </div>
+            <div class="h-[0.5px] w-full bg-gray-300"></div>
         </div>
-        <div class="flex justify-center">
-            <div class="main-container w-[1000px] bg-white shadow-lg mt-3 relative p-4 rounded-lg border-2 border-gray-300">
-                <div class="mt-5"></div>
-                 <!-- เมื่อมี Booking ในเวลานี้ -->
-                 <div v-if="canShowBooking">
-                    <BookingCard v-for="list in bookingDetail"
-                        :key="list.bookingId"
-                        :bookingId="list.bookingId"
-                        :date="list.date"
-                        :time_start="list.time_start"
-                        :time_end="list.time_end"
-                        :usage="list.usage"
-                        :status="list.status"
-                        :lastAction="list.lastAction"
-                        :icon="list.icon"
-                    />
-                    <div class="flex justify-center">
-                        <div class="w-[920px] bg-white shadow-lg mt-3 relative p-4 rounded-lg border border-gray-300">
-                            <div class="mt-5 my-3 ml-5">
-                                สมาชิกที่จะเข้าใช้ห้อง
+        <div v-if="selectedStatus == 'การเข้าใช้ห้อง'">
+            <div class="flex justify-center">
+                <div class="main-container w-[1000px] bg-white shadow-lg mt-3 relative p-4 rounded-lg border-2 border-gray-300">
+                    <div class="mt-5"></div>
+                    <!-- เมื่อมี Booking ในเวลานี้ -->
+                    <div v-if="canShowBooking">
+                        <BookingCard v-for="list in bookingDetail"
+                            :key="list.bookingId"
+                            :bookingId="list.bookingId"
+                            :date="list.date"
+                            :time_start="list.time_start"
+                            :time_end="list.time_end"
+                            :usage="list.usage"
+                            :status="list.status"
+                            :lastAction="list.lastAction"
+                            :icon="list.icon"
+                        />
+                        <div class="flex justify-center">
+                            <div class="w-[920px] bg-white shadow-lg mt-3 relative p-4 rounded-lg border border-gray-300">
+                                <div class="mt-5 my-3 ml-5">
+                                    สมาชิกที่จะเข้าใช้ห้อง
+                                </div>
+                                <ul v-for="member in bookingMember" :key="member.member" class="ml-12" style="list-style-type: disc;">
+                                    <li>{{ member.member }}</li>
+                                </ul>
+                                <div class="mt-5 my-3 ml-5">
+                                    อุปกรณ์ที่ต้องใช้
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="table mt-3 ml-5 w-[500px]">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="equipment in equipmentList" :key="equipment.equipment_id">
+                                                <td>{{ equipment.equipment_id }}</td>
+                                                <td>{{ equipment.equipment_name }}</td>
+                                                <td>{{ equipment.equipment_status }}</td>
+                                                <td>
+                                                    <button class="btn btn-sm custom-broken-button ml-3 w-30"
+                                                        @click="changeStatusEquipment(equipment.equipment_id)">
+                                                        เปลี่ยนสถานะ
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="font-bold ml-5 my-5">
+                                    OTP-สร้างเพื่อยืนยันการเข้าใช้ห้องของนิสิต
+                                </div>
+                                <input type="text" class="input input-bordered w-80 ml-5" />
+                                <div class="ml-3 my-5">
+                                    <button class="btn custom-blue-s ml-5">Generate</button>
+                                </div>
+                                <div v-if="!showCancelInput" class="flex justify-center mt-5">
+                                    <div class="flex justify-center mt-10 my-5">
+                                        <!-- <button class="btn custom-blacklist-button w-28">
+                                            Blacklist
+                                        </button> -->
+                                        <button class="btn custom-broken-button ml-3 w-28" @click="toggleCancelInput">
+                                            ยกเลิก
+                                        </button>
+                                    </div>
+                                </div>
+                                <div v-else>
+                                    <div class="ml-5">
+                                        เหตุผลการยกเลิก
+                                    </div>
+                                    <input type="text" placeholder="โปรดระบุเหตุผลในการยกเลิก" class="input input-bordered w-[845px] h-[100px] mx-5 mt-3"/>
+                                    <div class="flex justify-center">
+                                        <button class="btn custom-broken-button my-5 w-28">
+                                            ยกเลิก
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            <ul v-for="member in bookingMember" :key="member.member" class="ml-12" style="list-style-type: disc;">
-                                <li>{{ member.member }}</li>
-                            </ul>
-                            <div class="mt-5 my-3 ml-5">
-                                อุปกรณ์ที่ต้องใช้
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="table mt-3 ml-5 w-[500px]">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="equipment in equipmentList" :key="equipment.equipment_id">
-                                            <td>{{ equipment.equipment_id }}</td>
-                                            <td>{{ equipment.equipment_name }}</td>
-                                            <td>{{ equipment.equipment_status }}</td>
-                                            <td>
-                                                <button class="btn btn-sm custom-broken-button ml-3 w-30"
-                                                    @click="changeStatusEquipment(equipment.equipment_id)">
-                                                    เปลี่ยนสถานะ
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="font-bold ml-5 my-5">
-                                OTP-สร้างเพื่อยืนยันการเข้าใช้ห้องของนิสิต
-                            </div>
-                            <input type="text" class="input input-bordered w-80 ml-5" />
-                            <div class="ml-3 my-5">
-                                <button class="btn custom-blue-s ml-5">Generate</button>
-                            </div>
-                            <div v-if="!showCancelInput" class="flex justify-center mt-5">
-                                <div class="flex justify-center mt-10 my-5">
-                                    <!-- <button class="btn custom-blacklist-button w-28">
-                                        Blacklist
-                                    </button> -->
-                                    <button class="btn custom-broken-button ml-3 w-28" @click="toggleCancelInput">
-                                        ยกเลิก
+                        </div>
+                    </div>
+                    <!-- เมื่อไม่มี Booking ในเวลานี้ -->
+                    <div v-else>
+                        <div class="flex justify-center items-center h-[200px]">
+                            <span class="text-lg">ยังไม่มีข้อมูลการจองที่จะแสดงในขณะนี้</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="selectedStatus == 'เช็คความสะอาด'">
+            <div class="flex justify-center">
+                <div class="main-container w-[1000px] bg-white shadow-lg mt-3 relative p-4 rounded-lg border-2 border-gray-300">
+                    <div class="mt-5"></div>
+                    <!-- เมื่อมี Booking ในเวลานี้ -->
+                    <div v-if="canShowBooking">
+                        <BookingCard v-for="list in bookingDetail"
+                            :key="list.bookingId"
+                            :bookingId="list.bookingId"
+                            :date="list.date"
+                            :time_start="list.time_start"
+                            :time_end="list.time_end"
+                            :usage="list.usage"
+                            :status="list.status"
+                            :lastAction="list.lastAction"
+                            :icon="list.icon"
+                        />
+                        <div class="flex justify-center">
+                            <div class="w-[920px] bg-white shadow-lg mt-3 relative p-4 rounded-lg border border-gray-300">
+                                <div class="mt-5 my-3 ml-5">
+                                    สมาชิกที่จะเข้าใช้ห้อง
+                                </div>
+                                <ul v-for="member in bookingMember" :key="member.member" class="ml-12" style="list-style-type: disc;">
+                                    <li>{{ member.member }}</li>
+                                </ul>
+                                <div class="mt-5 my-3 ml-5">
+                                    อุปกรณ์ที่ต้องใช้
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="table mt-3 ml-5 w-[500px]">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="equipment in equipmentList" :key="equipment.equipment_id">
+                                                <td>{{ equipment.equipment_id }}</td>
+                                                <td>{{ equipment.equipment_name }}</td>
+                                                <td>{{ equipment.equipment_status }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-10 my-3 ml-5">
+                                    ตรวจความสะอาดเรียบร้อยหลังใช้งาน
+                                </div>
+                                <div class="flex justify-center">
+                                    <button class="btn custom-clean-btn w-36 mt-5 mb-5" @click="editData">
+                                        สะอาด
+                                    </button>
+                                    <button class="btn custom-broken-button w-36 mt-5 ml-5 mb-5" @click="editData">
+                                        ไม่สะอาด
                                     </button>
                                 </div>
-                            </div>
-                            <div v-else>
-                                <div class="ml-5">
-                                    เหตุผลการยกเลิก
-                                </div>
-                                <input type="text" placeholder="โปรดระบุเหตุผลในการยกเลิก" class="input input-bordered w-[845px] h-[100px] mx-5 mt-3"/>
                                 <div class="flex justify-center">
-                                    <button class="btn custom-broken-button my-5 w-28">
-                                        ยกเลิก
+                                    <button class="btn custom-blacklist-button w-36 mt-3 mb-10" @click="editData">
+                                        blacklist
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- เมื่อไม่มี Booking ในเวลานี้ -->
-                <div v-else>
-                    <div class="flex justify-center items-center h-[200px]">
-                        <span class="text-lg">ยังไม่มีข้อมูลการจองที่จะแสดงในขณะนี้</span>
+                    <!-- เมื่อไม่มี Booking ในเวลานี้ -->
+                    <div v-else>
+                        <div class="flex justify-center items-center h-[200px]">
+                            <span class="text-lg">ยังไม่มีข้อมูลการจองที่จะแสดงในขณะนี้</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -203,6 +293,11 @@ const canShowBooking = computed(() => {
 .custom-broken-button {
     background-color: #CC1417;
     color: white;
+}
+
+.custom-clean-btn {
+  background-color: #15570F;
+  color: #fff;
 }
 
 .custom-blacklist-button {

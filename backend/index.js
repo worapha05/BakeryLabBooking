@@ -28,7 +28,7 @@ let conn = null
 
 const initMySQL = async () => {
     conn = await mysql.createConnection({
-        // port: 8889,
+        port: 8889,
         host: 'localhost',
         user: 'root',
         password: 'root',
