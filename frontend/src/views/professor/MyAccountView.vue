@@ -112,7 +112,7 @@ const editData = async () => {
                         Contact Infromation
                         <div class="h-[0.5px] w-80 rounded-lg border-2 bg-gray-300 my-3"></div>
                     </div>
-                    <div class="flex justify-center mt-5">
+                    <div class="flex justify-center mt-5 mb-10">
                         <div>
                             <div class="my-5">
                                 Email
@@ -127,13 +127,6 @@ const editData = async () => {
                             </div>
                             <input type="text" placeholder="Phone" class="input input-bordered w-80" v-model="phone_number"/>
                         </div>
-                    </div>
-                    <div class="font-bold ml-10 mt-14">
-                        About user
-                        <div class="h-[0.5px] w-80 rounded-lg border-2 bg-gray-300 my-3"></div>
-                    </div>
-                    <div class="ml-32 my-9">
-                        นิสิตคณะอุตสาหกรรมเกษตร
                     </div>
                 </div>
             </div>

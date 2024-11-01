@@ -7,9 +7,9 @@ import BookingCard from '@/components/BookingCard.vue'
 const bookingDetail = [
     {
         bookingId: "1",
-        date: "31/10/2024",
+        date: "01/11/2024",
         time_start: "09:00",
-        time_end: ":00",
+        time_end: "12:00",
         usage: "ใช้เพื่อการแข่งขัน",
         status: "อนุมัติแล้ว",
         lastAction: "ดำเนินการขอจองล่าสุด 25/10/2024",
@@ -70,12 +70,27 @@ function toggleCancelInput() {
 // computed property เพื่อเปรียบเทียบวันและเวลา
 const canShowBooking = computed(() => {
     const today = new Date();
-    const currentDate = today.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const currentTime = today.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', hour12: false });
 
-    return bookingDetail.filter(booking => 
-        booking.date === currentDate
-    ).length > 0;
+    return bookingDetail.filter(booking => {
+        // แยกวันที่จากการจอง
+        const [day, month, year] = booking.date.split("/").map(Number);
+        const bookingDate = new Date(year, month - 1, day);
+
+        // ถ้าไม่ใช่วันที่ปัจจุบันหรือสถานะไม่ใช่ "อนุมัติ" ให้ข้าม
+        if (bookingDate.toDateString() !== today.toDateString() || booking.status !== "อนุมัติ") {
+            return false;
+        }
+
+        // ตรวจสอบช่วงเวลา
+        const [startHour, startMinute] = booking.time_start.split(":").map(Number);
+        const [endHour, endMinute] = booking.time_end.split(":").map(Number);
+        const startTime = new Date(bookingDate);
+        startTime.setHours(startHour, startMinute, 0, 0);
+        const endTime = new Date(bookingDate);
+        endTime.setHours(endHour, endMinute, 0, 0);
+
+        return today >= startTime && today <= endTime;
+    });
 });
 
 </script>
@@ -146,9 +161,9 @@ const canShowBooking = computed(() => {
                             </div>
                             <div v-if="!showCancelInput" class="flex justify-center mt-5">
                                 <div class="flex justify-center mt-10 my-5">
-                                    <button class="btn custom-blacklist-button w-28">
+                                    <!-- <button class="btn custom-blacklist-button w-28">
                                         Blacklist
-                                    </button>
+                                    </button> -->
                                     <button class="btn custom-broken-button ml-3 w-28" @click="toggleCancelInput">
                                         ยกเลิก
                                     </button>

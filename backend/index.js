@@ -304,6 +304,18 @@ app.get('/api/get-all-user', async (req, res) => {
         res.status(500).send({ message: "Internal server error" });
     }
 });
+//test!!!!
+app.get('/api/get-all-booking', async (req, res) => {
+    try {
+        const result = await conn.query("SELECT * FROM booking");
+        res.send({ message: "get all user",
+            user: result[0]
+        });
+    } catch (error) {
+        console.error('Error inserting room availability:', error);
+        res.status(500).send({ message: "Internal server error" });
+    }
+});
 
 app.patch('/api/edit-status-user', async (req, res) => {
     try {

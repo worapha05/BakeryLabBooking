@@ -47,8 +47,6 @@ const bookingDetail = ref([
 
 const today = new Date(); // ใช้เวลาปัจจุบันของเครื่อง
 const selectedDate = ref(null);
-const selectedStartTime = ref(null);
-const selectedEndTime = ref(null);
 
 // ให้แสดงแค่ booking ที่ "รออนุมัติ", "อนุมัติ" และวันที่ >= ปัจจุบัน
 const filteredBookings = computed(() => {
@@ -60,11 +58,24 @@ const filteredBookings = computed(() => {
         const endTime = new Date(bookingDate);
         endTime.setHours(endHour, endMinute);
 
-        return (
-            (booking.booking_status === "รออนุมัติ" || booking.booking_status === "อนุมัติ") &&
-            bookingDate >= today &&
-            endTime > today
-        );
+        // ตรวจสอบว่า selectedDate มีค่าเป็น null หรือไม่
+        if (!selectedDate.value) {
+            return (
+                (booking.booking_status === "รออนุมัติ" || booking.booking_status === "อนุมัติ") &&
+                bookingDate >= today &&
+                endTime > today
+            );
+        } else {
+            // กรองตามวันที่เลือก
+            const [selectedYear, selectedMonth, selectedDay] = selectedDate.value.split("-").map(Number);
+            const selectedBookingDate = new Date(selectedYear, selectedMonth - 1, selectedDay);
+            
+            return (
+                (booking.booking_status === "รออนุมัติ" || booking.booking_status === "อนุมัติ") &&
+                bookingDate.getTime() === selectedBookingDate.getTime() &&
+                endTime > today
+            );
+        }
     });
 });
 
@@ -73,6 +84,10 @@ const cancelBooking = (booking) => {
     booking.booking_status = "ถูกยกเลิก";
 }
 
+// ฟังก์ชันรีเซ็ตวันที่
+const resetDate = () => {
+    selectedDate.value = null;
+}
 </script>
 
 <template>
@@ -84,48 +99,16 @@ const cancelBooking = (booking) => {
                     <div class="h-[0.5px] w-full rounded-lg border-2 bg-gray-300 my-3 mr-4"></div>
                 </div>
                 <div class="ml-5 mt-5">
-                    เลือกวันเวลาในการเปลี่ยนสถานะห้องเป็นใช้งานได้หรือไม่พร้อมใช้งาน
+                    เลือกวันที่ในการเปลี่ยนสถานะการจอง
                 </div>
                 <div class="flex">
-                    <div class="relative my-3 ml-5">
+                    <div class="relative my-4 ml-5">
                         <input type="date" class="p-1.5 rounded-lg pl-10 border-2 w-full" id="date-input" v-model="selectedDate">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                             <img src="@/assets/icon_calendar.png" alt="">
                         </div>
                     </div>
-                    <div class="input flex input-bordered border-2 border-gray-200 items-center h-[45px] w-48 ml-5 my-3 pl-2 relative">
-                        <img src="@/assets/icon_clock.png" alt="">
-                        <select class="custom-select grow ml-1" v-model="selectedStartTime">
-                            <option value="" disabled selected>เลือกเวลาเริ่มต้น</option>
-                            <option>09.00</option>
-                            <option>10.00</option>
-                            <option>11.00</option>
-                            <option>12.00</option>
-                            <option>13.00</option>
-                            <option>14.00</option>
-                            <option>15.00</option>
-                            <option>16.00</option>
-                        </select>
-                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">▼</span>
-                    </div>
-                    <span class="ml-5 my-6">
-                        ถึง
-                    </span>
-                    <div class="input flex input-bordered border-2 border-gray-200 items-center h-[45px] w-48 ml-5 my-3 pl-2 relative">
-                        <img src="@/assets/icon_clock.png" alt="">
-                        <select class="custom-select grow ml-1" v-model="selectedEndTime">
-                            <option value="" disabled selected>เลือกเวลาสิ้นสุด</option>
-                            <option>09.00</option>
-                            <option>10.00</option>
-                            <option>11.00</option>
-                            <option>12.00</option>
-                            <option>13.00</option>
-                            <option>14.00</option>
-                            <option>15.00</option>
-                            <option>16.00</option>
-                        </select>
-                        <span class="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">▼</span>
-                    </div>
+                    <button class="btn ml-3 mt-3" @click="resetDate">Show All Date </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="table ml-5 mt-3">
@@ -161,7 +144,6 @@ const cancelBooking = (booking) => {
 </template>
 
 <style scoped>
-
 .custom-cancel-button {
     background-color: #CC1417;
     color: white;
@@ -173,5 +155,4 @@ const cancelBooking = (booking) => {
     appearance: none; /* ซ่อนลูกศรปกติ */
     position: relative; /* กำหนดตำแหน่งให้กับลูกศร */
 }
-
 </style>

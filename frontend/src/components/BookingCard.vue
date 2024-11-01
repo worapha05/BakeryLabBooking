@@ -9,6 +9,7 @@ export default {
     time_end: String,
     usage: String,
     status: String,
+    clean_status: String,
     lastAction: String,
     icon: String,
   },
@@ -88,6 +89,10 @@ export default {
                 <div>
                     <span class="text-lg font-normal text-black">สถานะ: </span>
                     <span class="text-lg font-normal text-blue-500">{{ status }}</span>
+                </div>
+                <div>
+                    <span class="text-lg font-normal text-black">ความสะอาด: </span>
+                    <span class="text-lg font-normal text-blue-500">{{ clean_status }}</span>
                 </div>
                 <div class="flex items-center gap-2 mt-2">
                     <div class="w-8 h-8 overflow-hidden">
